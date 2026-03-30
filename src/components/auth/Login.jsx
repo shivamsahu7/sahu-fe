@@ -1,20 +1,67 @@
-import React, { useState } from 'react';
-import { login } from '../../services/authService';
+import React, { useState, useEffect } from 'react';
+import { login, register, verifyOtp, forgotPassword, resetPassword } from '../../services/authService';
+import { getLocations } from '../../services/commonService';
 
-const Login = ({ isOpen, onClose, onAuthSuccess }) => {
+const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) => {
+  const [view, setView] = useState(initialView); // 'login', 'register', 'verify-otp', 'forgot-password'
+
+  useEffect(() => {
+    if (isOpen) {
+      setView(initialView);
+      setError('');
+      setSuccessMsg('');
+    }
+  }, [isOpen, initialView]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [userId, setUserId] = useState(null);
+
+  // Registration states
+  const [regData, setRegData] = useState({
+    first_name: '', last_name: '', date_of_birth: '', gender: 'male',
+    state_id: '', district: '', phone: '', relation: 'self'
+  });
+  const [statesList, setStatesList] = useState([]);
+  const [districtsList, setDistrictsList] = useState([]);
+
+  // Fetch states
+  useEffect(() => {
+    if (view === 'register') {
+      getLocations().then(data => setStatesList(data.data || [])).catch(console.error);
+    }
+  }, [view]);
+
+  // Fetch districts on state change
+  useEffect(() => {
+    if (regData.state_id) {
+      getLocations(regData.state_id).then(data => setDistrictsList(data.data || [])).catch(console.error);
+    } else {
+      setDistrictsList([]);
+    }
+  }, [regData.state_id]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSwitchView = (newView) => {
+    setView(newView);
+    setError('');
+    setSuccessMsg('');
+    setLoading(false);
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       await login(email, password);
       onAuthSuccess();
@@ -26,118 +73,258 @@ const Login = ({ isOpen, onClose, onAuthSuccess }) => {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const payload = {
+        first_name: regData.first_name,
+        last_name: regData.last_name,
+        email: email,
+        date_of_birth: regData.date_of_birth,
+        gender: regData.gender,
+        state_id: Number(regData.state_id),
+        district: Number(regData.district),
+        phone: regData.phone,
+        password: password,
+        relation: regData.relation
+      };
+      const res = await register(payload);
+      if (res.data?.user?.id || res.data?.userId || res.data?.id) {
+        setUserId(res.data?.user?.id || res.data?.userId || res.data?.id);
+        handleSwitchView('verify-otp');
+        setSuccessMsg('Registration successful. Please enter the OTP sent to your email/phone.');
+      } else {
+        // Fallback if userId isn't easily found
+        setError('Registered, but could not read userId for OTP verify. Please check backend response.');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      // API expects userId and otp
+      await verifyOtp(userId, otp);
+      setSuccessMsg('OTP Verified! You can now login.');
+      setTimeout(() => {
+        handleSwitchView('login');
+      }, 1500);
+    } catch (err) {
+      setError(err.message || 'OTP Verification failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await forgotPassword(email);
+      setSuccessMsg('If this email exists, a reset token has been sent to it. Please check your inbox and click the reset link!');
+    } catch (err) {
+      setError(err.message || 'Failed to request password reset.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await resetPassword(email, resetToken, password);
+      setSuccessMsg('Password has been securely reset! You can now login.');
+      setTimeout(() => {
+        handleSwitchView('login');
+      }, 2000);
+    } catch (err) {
+      setError(err.message || 'Failed to reset password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UI Helpers
+  const renderError = () => error && (
+    <div className="bg-red-50 text-red-600 text-xs p-4 rounded-xl mb-6">{error}</div>
+  );
+  
+  const renderSuccess = () => successMsg && (
+    <div className="bg-green-50 text-green-600 text-xs p-4 rounded-xl mb-6">{successMsg}</div>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-300">
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 transition-colors z-10"
-        >
-          <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative animate-in fade-in zoom-in py-10 px-6 sm:px-10 my-auto">
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 z-10">
+          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <div className="p-10 pt-16">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-serif text-brand-primary mb-2">Welcome Back</h2>
-            <p className="text-slate-500 text-sm">Please enter your details to login to your account</p>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-xs p-4 rounded-xl mb-6 flex items-center gap-3">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              {error}
+        {view === 'login' && (
+          <div>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-serif text-brand-primary mb-2">Welcome Back</h2>
+              <p className="text-slate-500 text-sm">Please enter your details to login</p>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all text-slate-700"
-                placeholder="john@example.com"
-              />
-            </div>
-
-            <div className="relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all text-slate-700 pr-14"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-brand-primary transition-colors focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
+            {renderError()}{renderSuccess()}
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email Address</label>
+                <input type="email" required className="w-full px-4 py-3 bg-slate-50 border rounded-xl" value={email} onChange={e => setEmail(e.target.value)} />
               </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Password</label>
+                <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 bg-slate-50 border rounded-xl" value={password} onChange={e => setPassword(e.target.value)} />
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <button type="button" onClick={() => handleSwitchView('forgot-password')} className="text-brand-primary font-bold hover:underline">Forgot Password?</button>
+              </div>
+              <button disabled={loading} type="submit" className="w-full py-4 bg-brand-primary text-white rounded-xl font-bold hover:bg-opacity-90 mt-4">{loading ? 'Loading...' : 'Login to Account'}</button>
+            </form>
+            <div className="mt-8 text-center text-sm">
+              <span className="text-slate-500">Don't have an account? </span>
+              <button onClick={() => handleSwitchView('register')} className="text-brand-primary font-bold hover:underline">Register Now</button>
             </div>
-
-            <div className="flex items-center justify-between text-xs px-1">
-              <label className="flex items-center gap-2 text-slate-500 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/20 transition-all" />
-                Remember me
-              </label>
-              <a href="#" className="text-brand-primary font-bold hover:underline">Forgot Password?</a>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-brand-primary text-white rounded-2xl font-bold hover:bg-brand-primary-dark transition-all transform hover:-translate-y-1 shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:transform-none mt-4"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Authenticating...
-                </span>
-              ) : 'Login to Account'}
-            </button>
-          </form>
-
-          <div className="mt-10 text-center">
-            <p className="text-slate-500 text-sm">
-              Don't have an account? <a href="#" className="text-brand-primary font-bold hover:underline">Register Now</a>
-            </p>
           </div>
-        </div>
+        )}
+
+        {view === 'register' && (
+          <div>
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-serif text-brand-primary mb-2">Create Account</h2>
+              <p className="text-slate-500 text-sm">Join the largest Sahu matrimony community</p>
+            </div>
+            {renderError()}{renderSuccess()}
+            <form onSubmit={handleRegister} className="space-y-4 text-sm max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">First Name</label>
+                  <input type="text" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.first_name} onChange={e => setRegData({...regData, first_name: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Last Name</label>
+                  <input type="text" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.last_name} onChange={e => setRegData({...regData, last_name: e.target.value})} />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Email</label>
+                <input type="email" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={email} onChange={e => setEmail(e.target.value)} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Date of Birth (DD-MM-YYYY)</label>
+                  <input type="text" placeholder="01-01-2000" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.date_of_birth} onChange={e => setRegData({...regData, date_of_birth: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Gender</label>
+                  <select className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.gender} onChange={e => setRegData({...regData, gender: e.target.value})}>
+                    <option value="male">Male (Groom)</option>
+                    <option value="female">Female (Bride)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">State</label>
+                  <select required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.state_id} onChange={e => setRegData({...regData, state_id: e.target.value})}>
+                    <option value="">Select State</option>
+                    {statesList.map(s => <option key={s.id} value={s.id}>{s.name || s.state_name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">District</label>
+                  <select required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.district} onChange={e => setRegData({...regData, district: e.target.value})}>
+                    <option value="">Select District</option>
+                    {districtsList.map(d => <option key={d.id} value={d.id}>{d.name || d.district_name}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Phone</label>
+                  <input type="tel" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.phone} onChange={e => setRegData({...regData, phone: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Profile For</label>
+                  <select className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.relation} onChange={e => setRegData({...regData, relation: e.target.value})}>
+                    <option value="self">Self</option>
+                    <option value="son">Son</option>
+                    <option value="daughter">Daughter</option>
+                    <option value="brother">Brother</option>
+                    <option value="sister">Sister</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
+                <input type="password" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={password} onChange={e => setPassword(e.target.value)} />
+              </div>
+
+              <button disabled={loading} type="submit" className="w-full py-4 mt-6 bg-brand-primary text-white rounded-xl font-bold hover:bg-opacity-90">{loading ? 'Registering...' : 'Create Account'}</button>
+            </form>
+            <div className="mt-6 text-center text-sm">
+              <span className="text-slate-500">Already have an account? </span>
+              <button onClick={() => handleSwitchView('login')} className="text-brand-primary font-bold hover:underline">Login Here</button>
+            </div>
+          </div>
+        )}
+
+        {view === 'verify-otp' && (
+          <div>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-serif text-brand-primary mb-2">Verify Account</h2>
+              <p className="text-slate-500 text-sm">Please enter the OTP sent to your email</p>
+            </div>
+            {renderError()}{renderSuccess()}
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">6-Digit OTP</label>
+                <input type="text" required className="w-full px-4 py-3 bg-slate-50 border rounded-xl tracking-widest text-center text-xl font-bold" maxLength="6" value={otp} onChange={e => setOtp(e.target.value)} />
+              </div>
+              <button disabled={loading} type="submit" className="w-full py-4 bg-brand-primary text-white rounded-xl font-bold">{loading ? 'Verifying...' : 'Verify OTP'}</button>
+            </form>
+          </div>
+        )}
+
+        {view === 'forgot-password' && (
+          <div>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-serif text-brand-primary mb-2">Forgot Password</h2>
+              <p className="text-slate-500 text-sm">We'll send a password reset token to your email</p>
+            </div>
+            {renderError()}{renderSuccess()}
+            <form onSubmit={handleForgotPassword} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email Address</label>
+                <input type="email" required className="w-full px-4 py-3 bg-slate-50 border rounded-xl" value={email} onChange={e => setEmail(e.target.value)} />
+              </div>
+              <button disabled={loading} type="submit" className="w-full py-4 bg-brand-primary text-white rounded-xl font-bold">{loading ? 'Sending...' : 'Send Reset Token'}</button>
+            </form>
+            <div className="mt-6 text-center text-sm">
+              <button onClick={() => handleSwitchView('login')} className="text-brand-primary font-bold hover:underline">Back to Login</button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
 };
 
-export default Login;
+export default AuthModal;

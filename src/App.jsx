@@ -11,10 +11,12 @@ import Disclaimer from './pages/compliance/Disclaimer'
 import ContactUs from './pages/compliance/ContactUs'
 import AboutUs from './pages/compliance/AboutUs'
 import PublicProfile from './pages/PublicProfile'
+import ResetPassword from './pages/ResetPassword'
 import './App.css'
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [authView, setAuthView] = useState('login');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
@@ -128,12 +130,15 @@ function App() {
           ) : (
             <>
               <button 
-                onClick={() => setIsLoginOpen(true)}
+                onClick={() => { setAuthView('login'); setIsLoginOpen(true); }}
                 className="px-3 md:px-6 py-1.5 md:py-2 text-[10px] md:text-sm font-bold text-brand-primary hover:text-brand-primary-dark transition-all cursor-pointer uppercase tracking-wider md:tracking-widest"
               >
                 Login
               </button>
-              <button className="px-4 md:px-8 py-1.5 md:py-2.5 text-[10px] md:text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-wider md:tracking-widest">
+              <button 
+                onClick={() => { setAuthView('register'); setIsLoginOpen(true); }}
+                className="px-4 md:px-8 py-1.5 md:py-2.5 text-[10px] md:text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-wider md:tracking-widest"
+              >
                 Register
               </button>
             </>
@@ -146,6 +151,7 @@ function App() {
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/user/:slug" element={<PublicProfile />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsConditions />} />
@@ -198,6 +204,7 @@ function App() {
 
       <Login 
         isOpen={isLoginOpen} 
+        initialView={authView}
         onClose={() => setIsLoginOpen(false)} 
         onAuthSuccess={handleAuthSuccess}
       />
