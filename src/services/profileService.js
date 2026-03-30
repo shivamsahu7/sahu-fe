@@ -20,3 +20,38 @@ export const updateProfile = async (stepData) => {
     throw new Error(message);
   }
 };
+export const uploadMedia = async (formData) => {
+  try {
+    const response = await apiClient.post('/user/media/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to upload media';
+    throw new Error(message);
+  }
+};
+
+export const getMediaList = async () => {
+  try {
+    const response = await apiClient.get('/user/media/list');
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to fetch media list';
+    throw new Error(message);
+  }
+};
+
+export const deleteMedia = async (mediaIds) => {
+  try {
+    const response = await apiClient.delete('/user/media/delete', {
+      data: { media_ids: mediaIds }
+    });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to delete media';
+    throw new Error(message);
+  }
+};

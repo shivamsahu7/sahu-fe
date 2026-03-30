@@ -63,7 +63,7 @@ const ProfilePage = () => {
           <div className="absolute -bottom-16 left-12 p-1 bg-white rounded-full shadow-xl">
             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-slate-100">
               <img 
-                src={profile.profile_image || "/uploads/profiles/default-profile.png"} 
+                src={profile.profileImage || profile.profile_image || "/uploads/profiles/default-profile.png"} 
                 alt={`${profile.first_name} ${profile.last_name}`}
                 className="w-full h-full object-cover"
                 onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=" + profile.first_name + "+" + profile.last_name + "&background=800000&color=fff"; }}

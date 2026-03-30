@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateProfile } from '../../services/profileService';
+import { updateProfile, getMediaList, uploadMedia, deleteMedia } from '../../services/profileService';
 import { 
   getLocations, 
   getEducations, 
@@ -24,6 +24,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
   const [colors, setColors] = useState([]);
   const [educations, setEducations] = useState([]);
   const [occupations, setOccupations] = useState([]);
+  
+  const [mediaList, setMediaList] = useState([]);
+  const [selectedMediaIds, setSelectedMediaIds] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     if (initialData && initialData.data) {
@@ -39,7 +44,87 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
     }
     fetchStates();
     fetchLookups();
-  }, [initialData]);
+    if (isOpen && step === 1) fetchMediaList();
+  }, [initialData, isOpen, step]);
+
+  const fetchMediaList = async () => {
+    try {
+      const response = await getMediaList();
+      if (response && response.data) {
+        setMediaList(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch media list:", error);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError('');
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('name', file.name);
+
+      const response = await uploadMedia(uploadFormData);
+      if (response && response.data) {
+        // Automatically select the new media
+        setFormData(prev => ({ ...prev, media_id: response.data.id }));
+        fetchMediaList(); // Refresh list
+      }
+    } catch (error) {
+      setUploadError(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const toggleMediaSelection = (e, mediaId) => {
+    e.stopPropagation();
+    setSelectedMediaIds(prev => 
+      prev.includes(mediaId) 
+        ? prev.filter(id => id !== mediaId) 
+        : [...prev, mediaId]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedMediaIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedMediaIds.length} selected photo(s)?`)) return;
+
+    try {
+      await deleteMedia(selectedMediaIds);
+      // Clear profile image if it was deleted
+      if (selectedMediaIds.includes(formData.media_id)) {
+        setFormData(prev => ({ ...prev, media_id: '' }));
+      }
+      setSelectedMediaIds([]);
+      fetchMediaList();
+    } catch (error) {
+      console.error("Bulk delete failed:", error);
+      alert(error.message);
+    }
+  };
+
+  const handleDeleteMedia = async (e, mediaId) => {
+    e.stopPropagation(); // Prevent selection
+    if (!window.confirm('Are you sure you want to delete this photo?')) return;
+
+    try {
+      await deleteMedia([mediaId]);
+      if (formData.media_id === mediaId) {
+        setFormData(prev => ({ ...prev, media_id: '' }));
+      }
+      setSelectedMediaIds(prev => prev.filter(id => id !== mediaId));
+      fetchMediaList();
+    } catch (error) {
+      console.error("Failed to delete media:", error);
+      alert(error.message);
+    }
+  };
 
   const fetchLookups = async () => {
     try {
@@ -227,8 +312,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
     switch(step) {
       case 1:
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-serif text-brand-primary">Step 1: Basic Info & Address</h3>
+          <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">First Name</label>
@@ -239,9 +323,100 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
                 <input name="last_name" maxLength={50} value={formData.last_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase text-slate-400">Phone</label>
-              <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+
+            {/* Media Selection */}
+            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+              <label className="text-[10px] font-bold uppercase text-slate-400 mb-4 block">Profile Image / प्रोफाइल फोटो</label>
+              
+              <div className="flex flex-col gap-6">
+                {/* Upload New */}
+                <div className="flex items-center gap-4">
+                  <label className="relative cursor-pointer group">
+                    <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" disabled={isUploading} />
+                    <div className="px-6 py-3 bg-white border-2 border-dashed border-brand-primary/20 rounded-2xl flex items-center gap-3 group-hover:border-brand-primary transition-all">
+                      {isUploading ? (
+                        <svg className="animate-spin h-5 w-5 text-brand-primary" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                      )}
+                      <span className="text-sm font-bold text-slate-700">Upload New Photo</span>
+                    </div>
+                  </label>
+                  {uploadError && <p className="text-[10px] text-red-500 font-bold">{uploadError}</p>}
+                </div>
+
+                {/* Gallery */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select from Gallery / गैलरी से चुनें</p>
+                    {selectedMediaIds.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleBulkDelete}
+                        className="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-red-100 transition-colors flex items-center gap-1.5"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete ({selectedMediaIds.length})
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    {mediaList.map((media) => (
+                      <div
+                        key={media.id}
+                        className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                          formData.media_id === media.id ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
+                        }`}
+                        onClick={() => setFormData(prev => ({ ...prev, media_id: media.id }))}
+                      >
+                        <img src={media.fullUrl || media.url || media.file_path} alt="Gallery item" className="w-full h-full object-cover" />
+                        
+                        {/* Profile Image Selection Overlay */}
+                        {formData.media_id === media.id && (
+                          <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
+                            <svg className="w-6 h-6 text-white bg-brand-primary rounded-full p-1 shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Multi-select Checkbox (Interactive area) */}
+                        <div 
+                          onClick={(e) => toggleMediaSelection(e, media.id)}
+                          className={`absolute top-1.5 left-1.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all z-10 ${
+                            selectedMediaIds.includes(media.id) 
+                              ? 'bg-red-500 border-red-500 text-white shadow-md' 
+                              : 'bg-white/90 border-slate-200 text-transparent hover:border-red-400 group-hover:shadow-sm'
+                          }`}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.5" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    ))}
+                    {mediaList.length === 0 && !isUploading && (
+                      <div className="col-span-full py-8 text-center bg-white/50 rounded-2xl border border-dashed border-slate-200">
+                        <p className="text-xs text-slate-400">No photos uploaded yet.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase text-slate-400">Phone</label>
+                <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col gap-1">
@@ -546,20 +721,28 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose}></div>
       
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col animate-in fade-in zoom-in duration-300">
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-serif text-slate-800">Update Profile</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(s => (
-                  <div key={s} className={`h-1 w-8 rounded-full ${s <= step ? 'bg-brand-primary' : 'bg-slate-100'}`}></div>
-                ))}
-              </div>
-              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest ml-2">Step {step} of 5</span>
+      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col animate-in fade-in zoom-in duration-300 max-h-[90vh]">
+        {/* Absolute Close Button */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full transition-all shadow-sm z-50 group border border-slate-100"
+          aria-label="Close modal"
+        >
+          <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div className="p-8 border-b border-slate-100">
+          <h2 className="text-2xl font-serif text-slate-800">Update Profile</h2>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map(s => (
+                <div key={s} className={`h-1 w-8 rounded-full ${s <= step ? 'bg-brand-primary' : 'bg-slate-100'}`}></div>
+              ))}
             </div>
+            <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest ml-2">Step {step} of 5</span>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full transition-colors font-bold text-slate-400 tracking-widest uppercase text-xs">Close</button>
         </div>
 
         <form onSubmit={handleNext} className="p-8 flex-1 overflow-y-auto">
