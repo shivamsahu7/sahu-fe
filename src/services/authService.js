@@ -1,25 +1,24 @@
+import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export const login = async (email, password) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/user/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Login failed with status ${response.status}`);
-    }
-
-    // Based on Swagger, 200 OK has No Body.
-    // We assume cookies or headers will handle the session.
-    return { success: true, status: response.status };
+    const response = await api.post('/user/auth/login', { email, password });
+    
+    // Axios returns the data directly in response.data
+    // Swagger says 200 OK has No Body, so we just check the status
+    return { success: true, status: response.status, data: response.data };
   } catch (error) {
-    console.error('Login Error:', error);
-    throw error;
+    const message = error.response?.data?.message || error.message || 'Login failed';
+    console.error('Login Error:', message);
+    throw new Error(message);
   }
 };
