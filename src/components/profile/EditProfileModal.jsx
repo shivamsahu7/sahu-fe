@@ -27,10 +27,15 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
 
   useEffect(() => {
     if (initialData && initialData.data) {
-      setFormData(initialData.data);
+      const data = { ...initialData.data };
+      // Default null booleans to false
+      if (data.manglik_dosh === null) data.manglik_dosh = false;
+      if (data.disability_status === null) data.disability_status = false;
+      
+      setFormData(data);
       // Fetch initial lists if IDs exist
-      if (initialData.data.state_id) fetchDistricts(initialData.data.state_id);
-      if (initialData.data.state_id && initialData.data.district_id) fetchCities(initialData.data.state_id, initialData.data.district_id);
+      if (data.state_id) fetchDistricts(data.state_id);
+      if (data.state_id && data.district_id) fetchCities(data.state_id, data.district_id);
     }
     fetchStates();
     fetchLookups();
@@ -198,7 +203,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
             stepData[f] = formData[f] || '';
           } else {
             // Ensure boolean fields are always true/false, never null/undefined
-            stepData[f] = !!formData[f];
+            stepData[f] = formData[f] === true ? true : false;
           }
         });
       }
@@ -404,11 +409,25 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
             <div className="grid grid-cols-2 gap-4 border-t pt-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Brothers</label>
-                <input type="number" name="number_of_brother" value={formData.number_of_brother || 0} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input 
+                  type="number" 
+                  name="number_of_brother" 
+                  value={formData.number_of_brother ?? 0} 
+                  onChange={handleChange} 
+                  onFocus={(e) => e.target.select()}
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Brothers</label>
-                <input type="number" name="number_of_married_brother" value={formData.number_of_married_brother || 0} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input 
+                  type="number" 
+                  name="number_of_married_brother" 
+                  value={formData.number_of_married_brother ?? 0} 
+                  onChange={handleChange} 
+                  onFocus={(e) => e.target.select()}
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                />
               </div>
             </div>
              <div className="flex flex-col gap-1">
@@ -418,11 +437,25 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
             <div className="grid grid-cols-2 gap-4 border-t pt-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Sisters</label>
-                <input type="number" name="number_of_sister" value={formData.number_of_sister || 0} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input 
+                  type="number" 
+                  name="number_of_sister" 
+                  value={formData.number_of_sister ?? 0} 
+                  onChange={handleChange} 
+                  onFocus={(e) => e.target.select()}
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Sisters</label>
-                <input type="number" name="number_of_married_sister" value={formData.number_of_married_sister || 0} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input 
+                  type="number" 
+                  name="number_of_married_sister" 
+                  value={formData.number_of_married_sister ?? 0} 
+                  onChange={handleChange} 
+                  onFocus={(e) => e.target.select()}
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                />
               </div>
             </div>
             <div className="flex flex-col gap-1">
@@ -473,7 +506,14 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Monthly Salary (₹)</label>
-              <input type="number" name="monthly_salary" value={formData.monthly_salary || 0} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+              <input 
+                type="number" 
+                name="monthly_salary" 
+                value={formData.monthly_salary ?? 0} 
+                onChange={handleChange} 
+                onFocus={(e) => e.target.select()}
+                className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+              />
             </div>
           </div>
         );
