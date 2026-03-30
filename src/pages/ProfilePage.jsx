@@ -8,6 +8,7 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('full');
   const navigate = useNavigate();
 
   const fetchProfile = async () => {
@@ -64,33 +65,63 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col">
         {/* Header/Banner Area */}
         <div className="relative h-48 bg-gradient-to-r from-brand-primary to-brand-primary-dark shrink-0">
-          <div className="absolute -bottom-16 left-12 p-1 bg-white rounded-full shadow-xl">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-slate-100">
+          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 p-1 bg-white rounded-full shadow-xl group/avatar">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-slate-100 relative">
               <img 
-                src={profile.profileImage || profile.profile_image || "/uploads/profiles/default-profile.png"} 
+                src={profile.profile_image || profile.profileImage || "/uploads/profiles/default-profile.png"} 
                 alt={`${profile.first_name} ${profile.last_name}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                 onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=" + profile.first_name + "+" + profile.last_name + "&background=800000&color=fff"; }}
               />
+              <div 
+                onClick={() => {
+                  setModalMode('image-only');
+                  setIsEditModalOpen(true);
+                }}
+                className="absolute inset-0 bg-black/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+              >
+                <div className="bg-white/20 backdrop-blur-md p-2 rounded-full border border-white/30">
+                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+              </div>
             </div>
+            {/* Quick Edit Badge */}
+            <button 
+              onClick={() => {
+                setModalMode('image-only');
+                setIsEditModalOpen(true);
+              }}
+              className="absolute bottom-2 right-2 w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white hover:scale-110 active:scale-95 transition-all cursor-pointer z-10"
+              title="Change Photo"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
           </div>
         </div>
 
         {/* Content Area */}
         <div className="pt-20 px-12 pb-12">
-          <div className="flex justify-between items-start mb-10">
-            <div>
-              <h2 className="text-4xl font-serif text-slate-800 mb-1">{profile.first_name} {profile.last_name}</h2>
-              <p className="text-brand-primary font-semibold tracking-wide uppercase text-xs">Sahu Community Member</p>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setIsEditModalOpen(true)}
-                className="px-6 py-2.5 bg-brand-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all"
-              >
-                Edit Profile
-              </button>
-            </div>
+          <div className="flex flex-col items-center text-center mb-10">
+            <h2 className="text-4xl font-serif text-slate-800 mb-1">{profile.first_name} {profile.last_name}</h2>
+            <p className="text-brand-primary font-semibold tracking-[0.2em] uppercase text-[10px] mb-6">Sahu Community Member</p>
+            
+            <button 
+              onClick={() => {
+                setModalMode('full');
+                setIsEditModalOpen(true);
+              }}
+              className="px-8 py-3 bg-brand-primary text-white rounded-full font-bold text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Profile
+            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -221,6 +252,7 @@ const ProfilePage = () => {
         onClose={() => setIsEditModalOpen(false)} 
         initialData={profileData}
         onUpdateSuccess={fetchProfile}
+        mode={modalMode}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateProfile, getMediaList, uploadMedia, deleteMedia } from '../../services/profileService';
+import { updateProfile, getMediaList, uploadMedia, deleteMedia, updateProfileImage } from '../../services/profileService';
 import { 
   getLocations, 
   getEducations, 
@@ -8,7 +8,7 @@ import {
   getColors 
 } from '../../services/commonService';
 
-const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => {
+const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode = 'full' }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -331,16 +331,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
       case 1:
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">First Name</label>
-                <input name="first_name" maxLength={50} value={formData.first_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+            {mode !== 'image-only' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-400">First Name</label>
+                  <input name="first_name" maxLength={50} value={formData.first_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-400">Last Name</label>
+                  <input name="last_name" maxLength={50} value={formData.last_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">Last Name</label>
-                <input name="last_name" maxLength={50} value={formData.last_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-              </div>
-            </div>
+            )}
 
             {/* Media Selection */}
             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
@@ -392,12 +394,20 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
                         className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
                           formData.media_id === media.id ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
                         }`}
-                        onClick={() => setFormData(prev => ({ ...prev, media_id: media.id }))}
+                        onClick={async () => {
+                          try {
+                            await updateProfileImage(media.media_id || media.id);
+                            setFormData(prev => ({ ...prev, media_id: media.media_id || media.id }));
+                            if (onUpdateSuccess) onUpdateSuccess();
+                          } catch (error) {
+                            console.error("Failed to update profile image:", error);
+                          }
+                        }}
                       >
                         <img src={media.fullUrl || media.url || media.file_path} alt="Gallery item" className="w-full h-full object-cover" />
                         
                         {/* Profile Image Selection Overlay */}
-                        {formData.media_id === media.id && (
+                        {(formData.media_id === media.media_id || formData.media_id === media.id) && (
                           <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
                             <svg className="w-6 h-6 text-white bg-brand-primary rounded-full p-1 shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
@@ -430,70 +440,74 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">Phone</label>
-                <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">State</label>
-                <select 
-                  name="state_id" 
-                  value={formData.state_id || ''} 
-                  onChange={handleChange} 
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
-                >
-                  <option value="">Select State</option>
-                  {states.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">District</label>
-                <select 
-                  name="district_id" 
-                  value={formData.district_id || ''} 
-                  onChange={handleChange} 
-                  disabled={!formData.state_id}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
-                >
-                  <option value="">Select District</option>
-                  {districts.map(d => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase text-slate-400">City</label>
-                <select 
-                  name="city_id" 
-                  value={formData.city_id || ''} 
-                  onChange={handleChange} 
-                  disabled={!formData.district_id}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
-                >
-                  <option value="">Select City</option>
-                  {cities.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase text-slate-400">Village</label>
-              <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase text-slate-400">Current Address</label>
-              <textarea name="address" maxLength={255} value={formData.address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase text-slate-400">Permanent Address</label>
-              <textarea name="permanent_address" maxLength={255} value={formData.permanent_address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
-            </div>
+            {mode !== 'image-only' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-400">Phone</label>
+                    <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-400">State</label>
+                    <select 
+                      name="state_id" 
+                      value={formData.state_id || ''} 
+                      onChange={handleChange} 
+                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                    >
+                      <option value="">Select State</option>
+                      {states.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-400">District</label>
+                    <select 
+                      name="district_id" 
+                      value={formData.district_id || ''} 
+                      onChange={handleChange} 
+                      disabled={!formData.state_id}
+                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
+                    >
+                      <option value="">Select District</option>
+                      {districts.map(d => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-400">City</label>
+                    <select 
+                      name="city_id" 
+                      value={formData.city_id || ''} 
+                      onChange={handleChange} 
+                      disabled={!formData.district_id}
+                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
+                    >
+                      <option value="">Select City</option>
+                      {cities.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-400">Village</label>
+                  <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-400">Current Address</label>
+                  <textarea name="address" maxLength={255} value={formData.address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-400">Permanent Address</label>
+                  <textarea name="permanent_address" maxLength={255} value={formData.permanent_address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
+                </div>
+              </>
+            )}
           </div>
         );
       case 2:
@@ -752,15 +766,19 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
         </button>
 
         <div className="p-8 border-b border-slate-100">
-          <h2 className="text-2xl font-serif text-slate-800">Update Profile</h2>
-          <div className="flex items-center gap-2 mt-1">
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map(s => (
-                <div key={s} className={`h-1 w-8 rounded-full ${s <= step ? 'bg-brand-primary' : 'bg-slate-100'}`}></div>
-              ))}
+          <h2 className="text-2xl font-serif text-slate-800">
+            {mode === 'image-only' ? 'Update Profile Photo' : 'Update Profile'}
+          </h2>
+          {mode !== 'image-only' && (
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map(s => (
+                  <div key={s} className={`h-1 w-8 rounded-full ${s <= step ? 'bg-brand-primary' : 'bg-slate-100'}`}></div>
+                ))}
+              </div>
+              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest ml-2">Step {step} of 5</span>
             </div>
-            <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest ml-2">Step {step} of 5</span>
-          </div>
+          )}
         </div>
 
         <form onSubmit={handleNext} className="p-8 flex-1 overflow-y-auto">
@@ -773,24 +791,38 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
 
           {renderStep()}
 
-          <div className="mt-10 flex gap-4">
-            {step > 1 && (
+          {mode !== 'image-only' && (
+            <div className="mt-10 flex gap-4">
+              {step > 1 && (
+                <button 
+                  type="button" 
+                  onClick={() => setStep(step - 1)}
+                  className="flex-1 py-4 rounded-xl border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 transition-all font-sans"
+                >
+                  Back
+                </button>
+              )}
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="flex-[2] bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 font-sans"
+              >
+                {loading ? 'Updating...' : (step === 5 ? 'Finalize Profile' : 'Save & Continue')}
+              </button>
+            </div>
+          )}
+          
+          {mode === 'image-only' && (
+            <div className="mt-10">
               <button 
                 type="button" 
-                onClick={() => setStep(step - 1)}
-                className="flex-1 py-4 rounded-xl border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 transition-all font-sans"
+                onClick={onClose}
+                className="w-full bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-sans"
               >
-                Back
+                Done
               </button>
-            )}
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="flex-[2] bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 font-sans"
-            >
-              {loading ? 'Updating...' : (step === 5 ? 'Finalize Profile' : 'Save & Continue')}
-            </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

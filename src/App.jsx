@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import ProfilePage from './pages/ProfilePage'
 import Login from './components/auth/Login'
 import { isAuthenticated, logout } from './services/authService'
+import { getProfileDetails } from './services/profileService'
 import PrivacyPolicy from './pages/compliance/PrivacyPolicy'
 import TermsConditions from './pages/compliance/TermsConditions'
 import Disclaimer from './pages/compliance/Disclaimer'
@@ -14,18 +15,32 @@ import './App.css'
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (isAuthenticated()) {
       setIsLoggedIn(true);
+      fetchUserBrief();
     }
   }, []);
+
+  const fetchUserBrief = async () => {
+    try {
+      const res = await getProfileDetails();
+      if (res && res.data) {
+        setUserProfile(res.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user brief:", error);
+    }
+  };
 
   const handleAuthSuccess = () => {
     setIsLoggedIn(true);
     setIsLoginOpen(false);
+    fetchUserBrief();
   };
 
   const handleLogout = () => {
@@ -72,11 +87,21 @@ function App() {
             <div className="flex gap-3">
               <Link 
                 to="/profile"
-                className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2"
+                className="pl-2 pr-6 py-1.5 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-3"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 shrink-0">
+                  {userProfile?.profile_image || userProfile?.profileImage ? (
+                    <img 
+                      src={userProfile.profile_image || userProfile.profileImage} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-brand-primary-dark text-[10px] font-bold uppercase">
+                      {userProfile?.first_name?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                </div>
                 My Profile
               </Link>
               <button 

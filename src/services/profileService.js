@@ -55,3 +55,14 @@ export const deleteMedia = async (mediaIds) => {
     throw new Error(message);
   }
 };
+
+export const updateProfileImage = async (mediaId) => {
+  try {
+    const response = await apiClient.post('/user/profile/update-image', { media_id: Number(mediaId) });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to update profile image';
+    console.error('Update Profile Image Error:', message);
+    throw new Error(message);
+  }
+};
