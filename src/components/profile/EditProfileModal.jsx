@@ -90,6 +90,19 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
       if (response && response.data) {
         // Automatically select the new media
         setFormData(prev => ({ ...prev, media_id: response.data.id }));
+        
+        // If this is their first ever image, auto-set it as the profile picture immediately
+        if (mediaList.length === 0) {
+          try {
+            await updateProfileImage(response.data.id);
+            if (onUpdateSuccess) {
+              onUpdateSuccess();
+            }
+          } catch (err) {
+            console.error("Auto-update profile image failed:", err);
+          }
+        }
+        
         fetchMediaList(); // Refresh list
       }
     } catch (error) {
