@@ -7,69 +7,111 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFiltered, setIsFiltered] = useState(false);
+
+  const [filters, setFilters] = useState({
+    gender: 'female',
+    min_age: 21,
+    max_age: 30
+  });
+
+  const fetchUsers = async (currentFilters) => {
+    try {
+      setLoading(true);
+      const data = await userService.fetchUsers(currentFilters);
+      setUsers(data.paginatedResults || []);
+    } catch (err) {
+      setError('Failed to load profiles. Please try again later.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        // Using the parameters from the request: gender=male&min_age=20&max_age=22
-        // However, making it a bit more flexible for the home page or showing a default set.
-        const data = await userService.fetchUsers({ 
-          gender: 'male', 
-          min_age: 20, 
-          max_age: 22 
-        });
-        setUsers(data.paginatedResults || []);
-      } catch (err) {
-        setError('Failed to load profiles. Please try again later.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Fetch all default profiles initially without applying the search filters
     fetchUsers();
   }, []);
+
+  const handleSearch = () => {
+    fetchUsers(filters);
+    setIsFiltered(true);
+    const element = document.getElementById('featured-profiles');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const clearFilters = () => {
+    fetchUsers();
+    setIsFiltered(false);
+    setFilters({ gender: 'female', min_age: 21, max_age: 30 });
+  };
 
   return (
     <main>
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         {/* Hero Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl">
-          <h1 className="text-5xl md:text-7xl font-serif text-slate-800 mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-serif text-slate-800 mb-2 leading-tight">
             Begin Your Journey to <br />
             <span className="italic text-brand-primary font-light">Everlasting Love</span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            The world's most trusted matrimony site. Connecting millions of hearts over 25 years.
+          <h2 className="text-xl md:text-2xl font-serif text-brand-primary/80 mb-6">
+            अनंत प्रेम की अपनी यात्रा शुरू करें
+          </h2>
+          <p className="text-lg md:text-xl text-slate-600 mb-2 max-w-2xl mx-auto">
+            The world's most trusted matrimony site.
+          </p>
+          <p className="hidden md:block text-base text-slate-500 mb-10 max-w-2xl mx-auto italic">
+            दुनिया की सबसे भरोसेमंद मैट्रिमोनी साइट।
           </p>
           
           {/* Quick Search Bar */}
           <div className="bg-white p-4 rounded-2xl shadow-2xl shadow-brand-primary/10 flex flex-wrap gap-4 items-center justify-center border border-brand-primary/5">
             <div className="flex flex-col items-start px-4 md:border-r border-slate-100">
               <label className="text-[10px] font-bold uppercase text-slate-400 mb-1">Looking for</label>
-              <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
-                <option>Bride</option>
-                <option>Groom</option>
+              <select 
+                value={filters.gender}
+                onChange={(e) => setFilters(prev => ({ ...prev, gender: e.target.value }))}
+                className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
+              >
+                <option value="female">Bride</option>
+                <option value="male">Groom</option>
               </select>
             </div>
             <div className="flex flex-col items-start px-4">
               <label className="text-[10px] font-bold uppercase text-slate-400 mb-1">Age</label>
               <div className="flex gap-2">
-                <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
-                  <option>21</option>
-                  <option>25</option>
-                  <option>30</option>
+                <select 
+                  value={filters.min_age}
+                  onChange={(e) => setFilters(prev => ({ ...prev, min_age: Number(e.target.value) }))}
+                  className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
+                >
+                  <option value={18}>18</option>
+                  <option value={20}>20</option>
+                  <option value={21}>21</option>
+                  <option value={25}>25</option>
+                  <option value={30}>30</option>
                 </select>
                 <span className="text-slate-300">to</span>
-                <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
-                  <option>30</option>
-                  <option>35</option>
-                  <option>40</option>
+                <select 
+                  value={filters.max_age}
+                  onChange={(e) => setFilters(prev => ({ ...prev, max_age: Number(e.target.value) }))}
+                  className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
+                >
+                  <option value={25}>25</option>
+                  <option value={30}>30</option>
+                  <option value={35}>35</option>
+                  <option value={40}>40</option>
+                  <option value={50}>50</option>
                 </select>
               </div>
             </div>
-            <button className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-xl shadow-brand-primary/20 cursor-pointer">
+            <button 
+              onClick={handleSearch}
+              className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-xl shadow-brand-primary/20 cursor-pointer"
+            >
               Let's Begin
             </button>
           </div>
@@ -81,11 +123,29 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
       </section>
       
       {/* Featured Profiles Section */}
-      <section className="py-24 px-6 bg-brand-accent/30">
+      <section id="featured-profiles" className="py-24 px-6 bg-brand-accent/30">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-serif text-slate-800 mb-4">Featured Profiles</h2>
             <p className="text-slate-500 max-w-xl mx-auto">Discover our most premium profiles. Handpicked for excellence and compatibility.</p>
+          </div>
+          
+          {/* Active Filter Status indicator */}
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-brand-primary/10">
+            <h3 className="text-lg font-serif text-slate-700 font-bold mb-4 sm:mb-0">
+              {isFiltered 
+                ? `Showing results for: ${filters.gender === 'female' ? 'Brides' : 'Grooms'} (Age ${filters.min_age}-${filters.max_age})` 
+                : "Showing All Profiles"}
+            </h3>
+            {isFiltered && (
+              <button 
+                onClick={clearFilters}
+                className="px-4 py-2 bg-white text-slate-500 text-xs font-bold uppercase tracking-widest rounded-lg border border-slate-200 hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm cursor-pointer flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                Clear Filters
+              </button>
+            )}
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

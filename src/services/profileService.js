@@ -1,14 +1,25 @@
 import apiClient from './apiClient';
 
+let profilePromise = null;
+
 export const getProfileDetails = async () => {
-  try {
-    const response = await apiClient.get('/user/profile/detail');
-    return response.data;
-  } catch (error) {
-    const message = error.response?.data?.message || error.message || 'Failed to fetch profile details';
-    console.error('Profile Fetch Error:', message);
-    throw new Error(message);
-  }
+  if (profilePromise) return profilePromise;
+
+  profilePromise = (async () => {
+    try {
+      const response = await apiClient.get('/user/profile/detail');
+      return response.data;
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to fetch profile details';
+      console.error('Profile Fetch Error:', message);
+      throw new Error(message);
+    } finally {
+      // Clear the promise after a short delay so manual refreshes hit the network again
+      setTimeout(() => { profilePromise = null; }, 2000);
+    }
+  })();
+
+  return profilePromise;
 };
 export const updateProfile = async (stepData) => {
   try {
