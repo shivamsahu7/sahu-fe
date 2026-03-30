@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  
+  --color-brand-primary: #8b1d41; /* Royal Maroon */
+  --color-brand-secondary: #d4af37; /* Gold */
+  --color-brand-accent: #f8f1e7; /* Cream */
+}
+
+@layer base {
+  body {
+    @apply bg-brand-accent text-slate-800 antialiased;
+  }
+}
