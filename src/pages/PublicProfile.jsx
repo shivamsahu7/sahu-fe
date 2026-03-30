@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import userService from '../services/userService';
 
@@ -28,6 +28,9 @@ const PublicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const hasFetched = useRef(false);
+  const prevSlug = useRef(null);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -42,8 +45,10 @@ const PublicProfile = () => {
       }
     };
 
-    if (slug) {
+    if (slug && (!hasFetched.current || prevSlug.current !== slug)) {
       fetchProfile();
+      hasFetched.current = true;
+      prevSlug.current = slug;
     }
   }, [slug]);
 
