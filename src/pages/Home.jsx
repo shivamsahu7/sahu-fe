@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import userService from '../services/userService';
 
 const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -129,8 +131,10 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
                         {user.city_name ? `${user.city_name}, ` : ''}{user.district_name}, {user.state_name}
                       </p>
                     </div>
-                    <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">
-
+                    <button 
+                      onClick={() => navigate(`/user/${user.slug}`)}
+                      className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer"
+                    >
                       View Profile
                     </button>
                   </div>

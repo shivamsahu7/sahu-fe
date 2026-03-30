@@ -10,6 +10,7 @@ import TermsConditions from './pages/compliance/TermsConditions'
 import Disclaimer from './pages/compliance/Disclaimer'
 import ContactUs from './pages/compliance/ContactUs'
 import AboutUs from './pages/compliance/AboutUs'
+import PublicProfile from './pages/PublicProfile'
 import './App.css'
 
 function App() {
@@ -139,6 +140,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/user/:slug" element={<PublicProfile />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsConditions />} />
