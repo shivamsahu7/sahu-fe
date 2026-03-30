@@ -1,14 +1,33 @@
 import { useState, useEffect } from 'react'
 import Login from './components/auth/Login'
+import ProfileModal from './components/profile/ProfileModal'
+import { getProfileDetails } from './services/profileService'
 import './App.css'
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    // You could also store a token here if the API returned one
+    // Fetch profile details immediately after login success if needed
+    // fetchProfile(); 
+  };
+
+  const fetchProfile = async () => {
+    setLoadingProfile(true);
+    try {
+      const data = await getProfileDetails();
+      setProfileData(data);
+      setIsProfileOpen(true);
+    } catch (error) {
+      alert("Failed to load profile: " + error.message);
+    } finally {
+      setLoadingProfile(false);
+    }
   };
   return (
     <div className="min-h-screen font-sans bg-brand-accent">
@@ -23,11 +42,22 @@ function App() {
         </div>
         <div className="flex gap-4">
           {isLoggedIn ? (
-            <button className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              My Profile
+            <button 
+              onClick={fetchProfile}
+              disabled={loadingProfile}
+              className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2 disabled:opacity-50"
+            >
+              {loadingProfile ? (
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              )}
+              {loadingProfile ? 'Loading...' : 'My Profile'}
             </button>
           ) : (
             <>
@@ -309,6 +339,12 @@ function App() {
         isOpen={isLoginOpen} 
         onClose={() => setIsLoginOpen(false)} 
         onAuthSuccess={handleLoginSuccess}
+      />
+
+      <ProfileModal 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
+        profileData={profileData}
       />
     </div>
   )
