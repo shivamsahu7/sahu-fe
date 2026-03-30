@@ -1,6 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import userService from '../services/userService';
 
 const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        // Using the parameters from the request: gender=male&min_age=20&max_age=22
+        // However, making it a bit more flexible for the home page or showing a default set.
+        const data = await userService.fetchUsers({ 
+          gender: 'male', 
+          min_age: 20, 
+          max_age: 22 
+        });
+        setUsers(data.paginatedResults || []);
+      } catch (err) {
+        setError('Failed to load profiles. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
     <main>
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
@@ -59,57 +87,60 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Profile Card 1 */}
-            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
-              <div className="relative h-80 overflow-hidden">
-                <img src="/bride_1.png" alt="Ananya" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+            {loading ? (
+              // Loading Skeletons
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-xl border border-brand-primary/5 animate-pulse">
+                  <div className="h-80 bg-slate-200" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-6 bg-slate-200 rounded w-3/4" />
+                    <div className="h-4 bg-slate-200 rounded w-1/2" />
+                    <div className="h-10 bg-slate-200 rounded-xl w-full" />
+                  </div>
+                </div>
+              ))
+            ) : error ? (
+              <div className="col-span-full text-center py-10">
+                <p className="text-red-500 font-medium">{error}</p>
               </div>
-              <div className="p-6 text-left">
-                <h3 className="text-xl font-serif text-slate-800 mb-1">Ananya, 26</h3>
-                <p className="text-slate-500 text-sm mb-4 italic">Software Engineer, Bangalore</p>
-                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
-              </div>
-            </div>
+            ) : users.length > 0 ? (
+              users.map((user) => (
+                <div key={user.id} className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+                  <div className="relative h-80 overflow-hidden">
+                    <img 
+                      src={user.profile_image || '/default-avatar.png'} 
+                      alt={`${user.first_name} ${user.last_name}`} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=" + user.first_name + "+" + user.last_name + "&background=800000&color=fff"; }}
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Verified</div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-white text-xs font-medium">{user.district_name}, {user.state_name}</p>
+                    </div>
+                  </div>
+                  <div className="p-6 text-left">
+                    <h3 className="text-xl font-serif text-slate-800 mb-1">{user.first_name} {user.last_name}, {user.age}</h3>
+                    <div className="flex items-center gap-1.5 text-slate-500 mb-4">
+                      <svg className="w-4 h-4 text-brand-primary opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <p className="text-sm italic truncate">
+                        {user.city_name ? `${user.city_name}, ` : ''}{user.district_name}, {user.state_name}
+                      </p>
+                    </div>
+                    <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">
 
-            {/* Profile Card 2 */}
-            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
-              <div className="relative h-80 overflow-hidden">
-                <img src="/groom_1.png" alt="Rohan" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+                      View Profile
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-10">
+                <p className="text-slate-500">No profiles found matching your criteria.</p>
               </div>
-              <div className="p-6 text-left">
-                <h3 className="text-xl font-serif text-slate-800 mb-1">Rohan, 28</h3>
-                <p className="text-slate-500 text-sm mb-4 italic">Accountant, Mumbai</p>
-                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
-              </div>
-            </div>
-
-            {/* Profile Card 3 */}
-            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
-              <div className="relative h-80 overflow-hidden">
-                <img src="/bride_2.png" alt="Priya" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
-              </div>
-              <div className="p-6 text-left">
-                <h3 className="text-xl font-serif text-slate-800 mb-1">Priya, 24</h3>
-                <p className="text-slate-500 text-sm mb-4 italic">UX Designer, Hyderabad</p>
-                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
-              </div>
-            </div>
-
-            {/* Profile Card 4 */}
-            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
-              <div className="relative h-80 overflow-hidden">
-                <img src="/groom_2.png" alt="Arjun" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
-              </div>
-              <div className="p-6 text-left">
-                <h3 className="text-xl font-serif text-slate-800 mb-1">Arjun, 30</h3>
-                <p className="text-slate-500 text-sm mb-4 italic">Marketing Manager, Delhi</p>
-                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -223,3 +254,4 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
 };
 
 export default Home;
+

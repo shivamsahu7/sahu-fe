@@ -65,14 +65,18 @@ function App() {
   return (
     <div className="min-h-screen font-sans bg-brand-accent flex flex-col">
       {/* Navbar */}
-      <nav className="sticky top-0 z-[90] bg-white/80 backdrop-blur-md border-b border-brand-primary/5 py-4 px-6 md:px-12 flex items-center justify-between shrink-0">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 bg-brand-primary rounded-2xl flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:rotate-6 transition-transform">
-            <span className="text-white font-serif text-2xl font-bold italic">S</span>
+      <nav className="sticky top-0 z-[90] bg-white/80 backdrop-blur-md border-b border-brand-primary/5 py-3 md:py-4 px-4 md:px-12 flex items-center justify-between shrink-0 gap-2">
+        <Link to="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-brand-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:rotate-6 transition-transform">
+            <span className="text-white font-serif text-xl md:text-2xl font-bold italic">S</span>
           </div>
-          <div className="text-left">
-            <span className="block text-xl font-serif text-slate-800 font-bold leading-none">Eternal Bonds</span>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-brand-primary font-bold">Sahu Matrimony</span>
+          <div className="text-left hidden sm:block">
+            <span className="block text-lg md:text-xl font-serif text-slate-800 font-bold leading-none">Eternal Bonds</span>
+            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">Sahu Matrimony</span>
+          </div>
+          <div className="text-left sm:hidden">
+            <span className="block text-base font-serif text-slate-800 font-bold leading-none">Eternal Bonds</span>
+            <span className="text-[8px] uppercase tracking-[0.1em] text-brand-primary font-bold">Sahu Matrimony</span>
           </div>
         </Link>
 
@@ -82,14 +86,14 @@ function App() {
           <button onClick={scrollToAbout} className="text-sm font-bold text-slate-600 hover:text-brand-primary transition-colors uppercase tracking-widest cursor-pointer border-none bg-transparent">About Us</button>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-2 md:gap-4 shrink-0">
           {isLoggedIn ? (
-            <div className="flex gap-3">
+            <div className="flex gap-2 md:gap-3">
               <Link 
                 to="/profile"
-                className="pl-2 pr-6 py-1.5 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-3"
+                className="pl-1 md:pl-2 pr-4 md:pr-6 py-1.5 text-xs md:text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2 md:gap-3"
               >
-                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 shrink-0">
+                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 shrink-0">
                   {userProfile?.profile_image || userProfile?.profileImage ? (
                     <img 
                       src={userProfile.profile_image || userProfile.profileImage} 
@@ -102,14 +106,15 @@ function App() {
                     </div>
                   )}
                 </div>
-                My Profile
+                <span className="hidden sm:inline">My Profile</span>
+                <span className="sm:hidden">Profile</span>
               </Link>
               <button 
                 onClick={handleLogout}
-                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                className="p-1.5 md:p-2 text-slate-400 hover:text-red-500 transition-colors"
                 title="Logout"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </button>
@@ -118,11 +123,11 @@ function App() {
             <>
               <button 
                 onClick={() => setIsLoginOpen(true)}
-                className="px-6 py-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark transition-all cursor-pointer uppercase tracking-widest"
+                className="px-3 md:px-6 py-1.5 md:py-2 text-[10px] md:text-sm font-bold text-brand-primary hover:text-brand-primary-dark transition-all cursor-pointer uppercase tracking-wider md:tracking-widest"
               >
                 Login
               </button>
-              <button className="px-8 py-2.5 text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-widest">
+              <button className="px-4 md:px-8 py-1.5 md:py-2.5 text-[10px] md:text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-wider md:tracking-widest">
                 Register
               </button>
             </>
