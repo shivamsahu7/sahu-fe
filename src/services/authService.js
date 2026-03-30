@@ -34,6 +34,16 @@ export const register = async (userData) => {
 export const verifyOtp = async (userId, otp) => {
   try {
     const response = await apiClient.post('/user/auth/verify-otp', { userId, otp });
+    
+    // Extract token if the user is automatically logged in upon OTP verification
+    const authHeader = response.headers.authorization || response.headers.Authorization;
+    if (authHeader) {
+      const token = authHeader.replace(/^Bearer\s+/i, '');
+      localStorage.setItem('token', token);
+    } else if (response.data?.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+
     return { success: true, status: response.status, data: response.data };
   } catch (error) {
     const message = error.response?.data?.message || error.message || 'OTP Verification failed';

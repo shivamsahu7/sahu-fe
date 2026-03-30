@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { login, register, verifyOtp, forgotPassword, resetPassword } from '../../services/authService';
 import { getLocations } from '../../services/commonService';
 
 const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) => {
+  const navigate = useNavigate();
   const [view, setView] = useState(initialView); // 'login', 'register', 'verify-otp', 'forgot-password'
 
   useEffect(() => {
@@ -21,9 +23,11 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [userId, setUserId] = useState(null);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Registration states
   const [regData, setRegData] = useState({
@@ -76,13 +80,28 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
     try {
+      // Format YYYY-MM-DD to DD-MM-YYYY expected by API
+      let formattedDob = regData.date_of_birth;
+      if (formattedDob && formattedDob.includes('-')) {
+        const parts = formattedDob.split('-');
+        if (parts[0].length === 4) { // ensuring it's YYYY-MM-DD
+          formattedDob = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
+
       const payload = {
         first_name: regData.first_name,
         last_name: regData.last_name,
         email: email,
-        date_of_birth: regData.date_of_birth,
+        date_of_birth: formattedDob,
         gender: regData.gender,
         state_id: Number(regData.state_id),
         district: Number(regData.district),
@@ -94,7 +113,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
       if (res.data?.user?.id || res.data?.userId || res.data?.id) {
         setUserId(res.data?.user?.id || res.data?.userId || res.data?.id);
         handleSwitchView('verify-otp');
-        setSuccessMsg('Registration successful. Please enter the OTP sent to your email/phone.');
+        setSuccessMsg(`OTP sent to email: ${email}. Please check.`);
       } else {
         // Fallback if userId isn't easily found
         setError('Registered, but could not read userId for OTP verify. Please check backend response.');
@@ -113,9 +132,11 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
     try {
       // API expects userId and otp
       await verifyOtp(userId, otp);
-      setSuccessMsg('OTP Verified! You can now login.');
+      setSuccessMsg('OTP Verified! Redirecting to your profile...');
+      onAuthSuccess(); // updates App.jsx state to show logged in
       setTimeout(() => {
-        handleSwitchView('login');
+        onClose();
+        navigate('/profile?edit=true');
       }, 1500);
     } catch (err) {
       setError(err.message || 'OTP Verification failed.');
@@ -225,8 +246,8 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Date of Birth (DD-MM-YYYY)</label>
-                  <input type="text" placeholder="01-01-2000" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={regData.date_of_birth} onChange={e => setRegData({...regData, date_of_birth: e.target.value})} />
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Date of Birth</label>
+                  <input type="date" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl appearance-none" value={regData.date_of_birth} onChange={e => setRegData({...regData, date_of_birth: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Gender</label>
@@ -271,9 +292,34 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialView = 'login' }) =>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
-                <input type="password" required className="w-full px-4 py-2 bg-slate-50 border rounded-xl" value={password} onChange={e => setPassword(e.target.value)} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Create Password</label>
+                  <div className="relative">
+                    <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-2 bg-slate-50 border rounded-xl pr-10" value={password} onChange={e => setPassword(e.target.value)} />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-primary focus:outline-none">
+                      {showPassword ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Confirm Password</label>
+                  <div className="relative">
+                    <input type={showConfirmPassword ? "text" : "password"} required className="w-full px-4 py-2 bg-slate-50 border rounded-xl pr-10" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-primary focus:outline-none">
+                      {showConfirmPassword ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <button disabled={loading} type="submit" className="w-full py-4 mt-6 bg-brand-primary text-white rounded-xl font-bold hover:bg-opacity-90">{loading ? 'Registering...' : 'Create Account'}</button>

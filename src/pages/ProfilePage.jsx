@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getProfileDetails } from '../services/profileService';
 import { isAuthenticated } from '../services/authService';
 import EditProfileModal from '../components/profile/EditProfileModal';
@@ -10,6 +10,16 @@ const ProfilePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('full');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('edit') === 'true') {
+      setIsEditModalOpen(true);
+      // Clean up URL so it doesn't re-open on refresh
+      navigate('/profile', { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const fetchProfile = async () => {
     setLoading(true);
