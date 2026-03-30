@@ -101,7 +101,7 @@ const ProfilePage = () => {
                   </li>
                   <li className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">Date of Birth</span>
-                    <span className="text-slate-700 font-medium">{profile.date_of_birth || 'Not specified'}</span>
+                    <span className="text-slate-700 font-medium">{profile.date_of_birth ? profile.date_of_birth.replace(/-/g, '/') : 'Not specified'}</span>
                   </li>
                   <li className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">Rashi</span>

@@ -100,7 +100,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
       [name]: val
     }));
 
-    // Handle location chaining
+    // Handle special formatting
     if (name === 'state_id') {
       setDistricts([]);
       setCities([]);
@@ -110,7 +110,17 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
       setCities([]);
       setFormData(prev => ({ ...prev, city_id: '' }));
       if (val) fetchCities(formData.state_id, val);
+    } else if (name === 'date_of_birth') {
+      // Convert YYYY-MM-DD from picker to DD-MM-YYYY for state (and eventually API)
+      if (val && val.includes('-') && val.split('-')[0].length === 4) {
+        val = val.split('-').reverse().join('-');
+      }
     }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: val
+    }));
   };
 
   const handleNext = async (e) => {
@@ -119,6 +129,21 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
     setLoading(true);
 
     try {
+      // Validate current step
+      const requiredFields = {
+        1: ['first_name', 'last_name', 'phone', 'state_id', 'district_id', 'city_id', 'village', 'address', 'permanent_address'],
+        2: ['gender', 'date_of_birth', 'birth_time', 'height', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
+        3: ['father_name', 'mother_name'], // Minimal family validation
+        4: ['education_id', 'occupation_id'], // Minimal career validation
+        5: ['introduction']
+      };
+
+      const missing = requiredFields[step]?.filter(f => !formData[f]);
+      if (missing && missing.length > 0) {
+        throw new Error(`Please fill all required fields: ${missing.map(f => f.replace(/_/g, ' ')).join(', ')}`);
+      }
+
+      setLoading(true);
       // Filter data for the current step
       const stepData = { step };
       
@@ -168,7 +193,14 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
         });
       } else if (step === 5) {
         const fields = ['introduction', 'manglik_dosh', 'disability_status'];
-        fields.forEach(f => stepData[f] = formData[f] !== undefined ? formData[f] : (typeof initialData.data[f] === 'boolean' ? initialData.data[f] : (f === 'introduction' ? '' : false)));
+        fields.forEach(f => {
+          if (f === 'introduction') {
+            stepData[f] = formData[f] || '';
+          } else {
+            // Ensure boolean fields are always true/false, never null/undefined
+            stepData[f] = !!formData[f];
+          }
+        });
       }
 
       await updateProfile(stepData);
@@ -280,13 +312,19 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Date of Birth</label>
-                <input name="date_of_birth" placeholder="DD-MM-YYYY" value={formData.date_of_birth || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input 
+                  type="date"
+                  name="date_of_birth" 
+                  value={formData.date_of_birth ? (formData.date_of_birth.includes('-') && formData.date_of_birth.split('-')[0].length === 2 ? formData.date_of_birth.split('-').reverse().join('-') : formData.date_of_birth) : ''} 
+                  onChange={handleChange} 
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Birth Time</label>
-                <input name="birth_time" placeholder="HH:MM:SS" value={formData.birth_time || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input type="time" name="birth_time" step="1" value={formData.birth_time || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Height (ft)</label>
