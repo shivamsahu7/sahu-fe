@@ -4,6 +4,11 @@ import Home from './pages/Home'
 import ProfilePage from './pages/ProfilePage'
 import Login from './components/auth/Login'
 import { isAuthenticated, logout } from './services/authService'
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy'
+import TermsConditions from './pages/compliance/TermsConditions'
+import Disclaimer from './pages/compliance/Disclaimer'
+import ContactUs from './pages/compliance/ContactUs'
+import AboutUs from './pages/compliance/AboutUs'
 import './App.css'
 
 function App() {
@@ -104,6 +109,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsConditions />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/contact" element={<ContactUs />} />
         </Routes>
       </div>
 
@@ -128,14 +138,16 @@ function App() {
             <h4 className="text-sm font-bold uppercase tracking-widest mb-8">Community</h4>
             <ul className="space-y-4 text-slate-400 text-sm">
               <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-              <li><button onClick={scrollToAbout} className="hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer">About Us</button></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-bold uppercase tracking-widest mb-8">Support</h4>
             <ul className="space-y-4 text-slate-400 text-sm">
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Use</a></li>
+              <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">Terms Conditions</Link></li>
+              <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
             </ul>
           </div>
         </div>
