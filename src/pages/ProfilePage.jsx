@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProfileDetails } from '../services/profileService';
 import { isAuthenticated } from '../services/authService';
@@ -21,6 +21,7 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -28,7 +29,10 @@ const ProfilePage = () => {
       return;
     }
 
-    fetchProfile();
+    if (!hasFetched.current) {
+      fetchProfile();
+      hasFetched.current = true;
+    }
   }, [navigate]);
 
   if (loading) {
@@ -89,101 +93,117 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Left Column: Personal Info */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Personal Details</h3>
-                <ul className="space-y-4">
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Gender</span>
-                    <span className="text-slate-700 font-medium capitalize">{profile.gender || 'Not specified'}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Date of Birth</span>
-                    <span className="text-slate-700 font-medium">{profile.date_of_birth ? profile.date_of_birth.replace(/-/g, '/') : 'Not specified'}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Rashi</span>
-                    <span className="text-slate-700 font-medium">{profile.rashi_name || 'Not specified'}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Complexion</span>
-                    <span className="text-slate-700 font-medium">{profile.color_name || 'Not specified'}</span>
-                  </li>
-                </ul>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Section: Personal & Religious */}
+            <div className="space-y-6">
+              <section className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+                  Personal & Religious Details
+                </h3>
+                <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                  <DetailItem label="Gender" value={profile.gender} />
+                  <DetailItem label="Height" value={profile.height ? `${profile.height} ft` : ''} />
+                  <DetailItem label="Date of Birth" value={profile.date_of_birth?.replace(/-/g, '/')} />
+                  <DetailItem label="Time of Birth" value={profile.birth_time} />
+                  <DetailItem label="Rashi" value={profile.rashi_name} />
+                  <DetailItem label="Complexion" value={profile.color_name} />
+                  <DetailItem label="Gotr" value={profile.gotr} highlight />
+                  <DetailItem label="Mama Gotr" value={profile.mama_gotr} highlight />
+                  <DetailItem label="Manglik" value={profile.manglik_dosh ? 'Yes' : 'No'} />
+                  <DetailItem label="Physical Disability" value={profile.disability_status ? 'Yes' : 'No'} />
+                </div>
+              </section>
 
-              <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Contact Info</h3>
-                <ul className="space-y-4">
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Location</span>
-                    <span className="text-slate-700 font-medium text-sm leading-relaxed">
-                      {profile.city_name}, {profile.district_name}, {profile.state_name}
-                    </span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Village & Address</span>
-                    <span className="text-slate-700 font-medium text-xs">
-                      {profile.village}, {profile.address}
-                    </span>
-                  </li>
-                  <li className="flex flex-col pt-2">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Phone</span>
-                    <span className="text-slate-700 font-medium font-mono">{profile.phone}</span>
-                  </li>
-                </ul>
-              </div>
+              <section className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+                  Education & Career
+                </h3>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <DetailItem label="Highest Education" value={profile.education_name} />
+                    <DetailItem label="Monthly Salary" value={profile.monthly_salary ? `₹${profile.monthly_salary}` : 'Private'} />
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Education Details</span>
+                    <p className="text-slate-700 font-medium text-sm">{profile.education_detail || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Occupation</span>
+                    <p className="text-slate-700 font-medium text-sm">{profile.occupation_name}</p>
+                    <p className="text-xs text-slate-500 mt-1">{profile.occupation_detail}</p>
+                  </div>
+                </div>
+              </section>
             </div>
 
-            {/* Middle Column: Family Details */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Family Background</h3>
-                <ul className="space-y-4">
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Father's Name</span>
-                    <span className="text-slate-700 font-medium">{profile.father_name || 'Not provided'}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Mother's Name</span>
-                    <span className="text-slate-700 font-medium">{profile.mother_name || 'Not provided'}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Gotr / Clan</span>
-                    <span className="text-brand-primary font-bold">{profile.gotr || 'Sahu'}</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            {/* Right Section: Family & Location */}
+            <div className="space-y-6">
+              <section className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+                  Family Background
+                </h3>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                    <DetailItem label="Father's Name" value={profile.father_name} />
+                    <DetailItem label="Father's Occupation" value={profile.father_occupation} />
+                    <DetailItem label="Mother's Name" value={profile.mother_name} />
+                    <DetailItem label="Mother's Occupation" value={profile.mother_occupation} />
+                  </div>
+                  <div className="pt-4 border-t border-slate-100 flex items-center gap-8">
+                    <div className="text-center">
+                      <span className="text-[9px] text-slate-400 uppercase font-bold block mb-1">Brothers</span>
+                      <p className="text-sm font-bold text-slate-700">{profile.number_of_brother || 0} Total / {profile.number_of_married_brother || 0} Married</p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[9px] text-slate-400 uppercase font-bold block mb-1">Sisters</span>
+                      <p className="text-sm font-bold text-slate-700">{profile.number_of_sister || 0} Total / {profile.number_of_married_sister || 0} Married</p>
+                    </div>
+                  </div>
+                  {(profile.about_brother || profile.about_sister) && (
+                    <div className="text-xs text-slate-500 bg-white/50 p-3 rounded-xl italic">
+                      {profile.about_brother && <p>Brothers: {profile.about_brother}</p>}
+                      {profile.about_sister && <p className="mt-1">Sisters: {profile.about_sister}</p>}
+                    </div>
+                  )}
+                </div>
+              </section>
 
-            {/* Right Column: Professional */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Education & Career</h3>
-                <ul className="space-y-4">
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Education</span>
-                    <span className="text-slate-700 font-medium">{profile.education_name || 'Graduate'}</span>
-                    <span className="text-[10px] text-slate-500">{profile.education_detail}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Occupation</span>
-                    <span className="text-slate-700 font-medium">{profile.occupation_name || 'Professional'}</span>
-                    <span className="text-[10px] text-slate-500">{profile.occupation_detail}</span>
-                  </li>
-                  <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Monthly Income</span>
-                    <span className="text-brand-primary font-bold">{profile.monthly_salary ? `₹${profile.monthly_salary}` : 'Private'}</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                <h4 className="text-sm font-serif text-brand-primary mb-3">About {profile.first_name}</h4>
-                <p className="text-xs text-slate-500 leading-relaxed italic">
-                  {profile.introduction || "A proud member of the Sahu community looking for a meaningful connection based on traditions and modern values."}
+              <section className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+                  Location & Address
+                </h3>
+                <div className="space-y-4">
+                  <DetailItem label="Current City" value={`${profile.city_name}, ${profile.state_name}`} />
+                  <div>
+                    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Full Address</span>
+                    <p className="text-slate-700 font-medium text-sm leading-relaxed">
+                      {profile.village && `${profile.village}, `}{profile.address}
+                    </p>
+                  </div>
+                  {profile.permanent_address && (
+                    <div className="pt-3 border-t border-zinc-100">
+                      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Permanent Address</span>
+                      <p className="text-slate-700 font-medium text-sm leading-relaxed">
+                        {profile.permanent_address}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <div className="bg-brand-primary/5 p-6 rounded-[2rem] border border-brand-primary/10">
+                <h4 className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Introduction
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed italic">
+                  "{profile.introduction || "A meaningful introduction will help others understand you better. Edit your profile to add more details about yourself and your expectations."}"
                 </p>
               </div>
             </div>
@@ -205,5 +225,14 @@ const ProfilePage = () => {
     </div>
   );
 };
+
+const DetailItem = ({ label, value, highlight }) => (
+  <div className="flex flex-col">
+    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">{label}</span>
+    <span className={`text-sm font-medium ${highlight ? 'text-brand-primary font-bold' : 'text-slate-700'}`}>
+      {value || 'Not provided'}
+    </span>
+  </div>
+);
 
 export default ProfilePage;

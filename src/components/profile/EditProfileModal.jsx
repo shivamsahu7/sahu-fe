@@ -30,7 +30,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
+  // Fetch static lookup data once when modal opens
   useEffect(() => {
+    if (isOpen) {
+      fetchStates();
+      fetchLookups();
+    }
+  }, [isOpen]);
+
+  // Sync initialData and fetch step-specific data
+  useEffect(() => {
+    if (!isOpen) return;
+    
     if (initialData && initialData.data) {
       const data = { ...initialData.data };
       // Default null booleans to false
@@ -41,11 +52,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess }) => 
       // Fetch initial lists if IDs exist
       if (data.state_id) fetchDistricts(data.state_id);
       if (data.state_id && data.district_id) fetchCities(data.state_id, data.district_id);
+    } else {
+      // Clear form when opening empty
+      setFormData({});
     }
-    fetchStates();
-    fetchLookups();
-    if (isOpen && step === 1) fetchMediaList();
-  }, [initialData, isOpen, step]);
+  }, [initialData, isOpen]);
+
+  // Fetch media list only on Step 1
+  useEffect(() => {
+    if (isOpen && step === 1) {
+      fetchMediaList();
+    }
+  }, [isOpen, step]);
 
   const fetchMediaList = async () => {
     try {
