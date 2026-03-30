@@ -26,7 +26,6 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
   const [occupations, setOccupations] = useState([]);
   
   const [mediaList, setMediaList] = useState([]);
-  const [selectedMediaIds, setSelectedMediaIds] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
@@ -100,43 +99,17 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
     }
   };
 
-  const toggleMediaSelection = (e, mediaId) => {
-    e.stopPropagation();
-    setSelectedMediaIds(prev => 
-      prev.includes(mediaId) 
-        ? prev.filter(id => id !== mediaId) 
-        : [...prev, mediaId]
-    );
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedMediaIds.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedMediaIds.length} selected photo(s)?`)) return;
-
-    try {
-      await deleteMedia(selectedMediaIds);
-      // Clear profile image if it was deleted
-      if (selectedMediaIds.includes(formData.media_id)) {
-        setFormData(prev => ({ ...prev, media_id: '' }));
-      }
-      setSelectedMediaIds([]);
-      fetchMediaList();
-    } catch (error) {
-      console.error("Bulk delete failed:", error);
-      alert(error.message);
-    }
-  };
-
   const handleDeleteMedia = async (e, mediaId) => {
-    e.stopPropagation(); // Prevent selection
-    if (!window.confirm('Are you sure you want to delete this photo?')) return;
-
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     try {
       await deleteMedia([mediaId]);
       if (formData.media_id === mediaId) {
         setFormData(prev => ({ ...prev, media_id: '' }));
       }
-      setSelectedMediaIds(prev => prev.filter(id => id !== mediaId));
       fetchMediaList();
     } catch (error) {
       console.error("Failed to delete media:", error);
@@ -373,63 +346,55 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 {/* Gallery */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select from Gallery / गैलरी से चुनें</p>
-                    {selectedMediaIds.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleBulkDelete}
-                        className="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-red-100 transition-colors flex items-center gap-1.5"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Delete ({selectedMediaIds.length})
-                      </button>
-                    )}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gallery / गैलरी</p>
                   </div>
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                    {mediaList.map((media) => (
-                      <div
-                        key={media.id}
-                        className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                          formData.media_id === media.id ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
-                        }`}
-                        onClick={async () => {
-                          try {
-                            await updateProfileImage(media.media_id || media.id);
-                            setFormData(prev => ({ ...prev, media_id: media.media_id || media.id }));
-                            if (onUpdateSuccess) onUpdateSuccess();
-                          } catch (error) {
-                            console.error("Failed to update profile image:", error);
-                          }
-                        }}
-                      >
-                        <img src={media.fullUrl || media.url || media.file_path} alt="Gallery item" className="w-full h-full object-cover" />
-                        
-                        {/* Profile Image Selection Overlay */}
-                        {(formData.media_id === media.media_id || formData.media_id === media.id) && (
-                          <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
-                            <svg className="w-6 h-6 text-white bg-brand-primary rounded-full p-1 shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    {mediaList.map((media) => {
+                      const currentId = media.media_id || media.id;
+                      const isSelected = Number(formData.media_id) === Number(currentId);
+
+                      return (
+                        <div
+                          key={currentId}
+                          className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                            isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
+                          }`}
+                          onClick={async () => {
+                            try {
+                              await updateProfileImage(currentId);
+                              setFormData(prev => ({ ...prev, media_id: currentId }));
+                              if (onUpdateSuccess) onUpdateSuccess();
+                            } catch (error) {
+                              console.error("Failed to update profile image:", error);
+                            }
+                          }}
+                        >
+                          <img src={media.fullUrl || media.url || media.file_path} alt="Gallery item" className="w-full h-full object-cover" />
+                          
+                          {/* Profile Image Selection Overlay */}
+                          {isSelected && (
+                            <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
+                              <div className="bg-brand-primary rounded-full p-1.5 shadow-lg">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Delete Icon */}
+                          <div 
+                            onClick={(e) => handleDeleteMedia(e, currentId)}
+                            className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 hover:bg-red-500 hover:text-white text-red-500 rounded-lg shadow-md flex items-center justify-center transition-all z-10"
+                            title="Delete Photo"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </div>
-                        )}
-
-                        {/* Multi-select Checkbox (Interactive area) */}
-                        <div 
-                          onClick={(e) => toggleMediaSelection(e, media.id)}
-                          className={`absolute top-1.5 left-1.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all z-10 ${
-                            selectedMediaIds.includes(media.id) 
-                              ? 'bg-red-500 border-red-500 text-white shadow-md' 
-                              : 'bg-white/90 border-slate-200 text-transparent hover:border-red-400 group-hover:shadow-sm'
-                          }`}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.5" d="M5 13l4 4L19 7" />
-                          </svg>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {mediaList.length === 0 && !isUploading && (
                       <div className="col-span-full py-8 text-center bg-white/50 rounded-2xl border border-dashed border-slate-200">
                         <p className="text-xs text-slate-400">No photos uploaded yet.</p>
