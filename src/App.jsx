@@ -1,7 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Login from './components/auth/Login'
 import './App.css'
 
 function App() {
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    // You could also store a token here if the API returned one
+  };
   return (
     <div className="min-h-screen font-sans bg-brand-accent">
       {/* Navbar */}
@@ -14,12 +22,26 @@ function App() {
           <a href="#about" className="hover:text-brand-primary transition-colors">About Us</a>
         </div>
         <div className="flex gap-4">
-          <button className="px-4 py-2 text-sm font-semibold border border-brand-primary text-brand-primary rounded-full hover:bg-brand-primary hover:text-white transition-all cursor-pointer">
-            Login
-          </button>
-          <button className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer">
-            Register
-          </button>
+          {isLoggedIn ? (
+            <button className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Profile
+            </button>
+          ) : (
+            <>
+              <button 
+                onClick={() => setIsLoginOpen(true)}
+                className="px-4 py-2 text-sm font-semibold border border-brand-primary text-brand-primary rounded-full hover:bg-brand-primary hover:text-white transition-all cursor-pointer"
+              >
+                Login
+              </button>
+              <button className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer">
+                Register
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -281,6 +303,13 @@ function App() {
           © 2026 Eternal Bonds Matrimony. All rights reserved.
         </div>
       </footer>
+
+      {/* Auth Modals */}
+      <Login 
+        isOpen={isLoginOpen} 
+        onClose={() => setIsLoginOpen(false)} 
+        onAuthSuccess={handleLoginSuccess}
+      />
     </div>
   )
 }
