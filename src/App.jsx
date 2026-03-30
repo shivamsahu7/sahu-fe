@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import ProfilePage from './pages/ProfilePage'
@@ -20,10 +20,15 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const hasFetchedBrief = useRef(false);
+
   useEffect(() => {
     if (isAuthenticated()) {
       setIsLoggedIn(true);
-      fetchUserBrief();
+      if (!hasFetchedBrief.current) {
+        fetchUserBrief();
+        hasFetchedBrief.current = true;
+      }
     }
   }, []);
 
