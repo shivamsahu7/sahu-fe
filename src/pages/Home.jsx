@@ -1,0 +1,225 @@
+import React from 'react';
+
+const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
+  return (
+    <main>
+      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+        {/* Hero Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl">
+          <h1 className="text-5xl md:text-7xl font-serif text-slate-800 mb-6 leading-tight">
+            Begin Your Journey to <br />
+            <span className="italic text-brand-primary font-light">Everlasting Love</span>
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
+            The world's most trusted matrimony site. Connecting millions of hearts over 25 years.
+          </p>
+          
+          {/* Quick Search Bar */}
+          <div className="bg-white p-4 rounded-2xl shadow-2xl shadow-brand-primary/10 flex flex-wrap gap-4 items-center justify-center border border-brand-primary/5">
+            <div className="flex flex-col items-start px-4 md:border-r border-slate-100">
+              <label className="text-[10px] font-bold uppercase text-slate-400 mb-1">Looking for</label>
+              <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+                <option>Bride</option>
+                <option>Groom</option>
+              </select>
+            </div>
+            <div className="flex flex-col items-start px-4">
+              <label className="text-[10px] font-bold uppercase text-slate-400 mb-1">Age</label>
+              <div className="flex gap-2">
+                <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+                  <option>21</option>
+                  <option>25</option>
+                  <option>30</option>
+                </select>
+                <span className="text-slate-300">to</span>
+                <select className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+                  <option>30</option>
+                  <option>35</option>
+                  <option>40</option>
+                </select>
+              </div>
+            </div>
+            <button className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-xl shadow-brand-primary/20 cursor-pointer">
+              Let's Begin
+            </button>
+          </div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-brand-secondary/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+      </section>
+      
+      {/* Featured Profiles Section */}
+      <section className="py-24 px-6 bg-brand-accent/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-serif text-slate-800 mb-4">Featured Profiles</h2>
+            <p className="text-slate-500 max-w-xl mx-auto">Discover our most premium profiles. Handpicked for excellence and compatibility.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Profile Card 1 */}
+            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+              <div className="relative h-80 overflow-hidden">
+                <img src="/bride_1.png" alt="Ananya" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+              </div>
+              <div className="p-6 text-left">
+                <h3 className="text-xl font-serif text-slate-800 mb-1">Ananya, 26</h3>
+                <p className="text-slate-500 text-sm mb-4 italic">Software Engineer, Bangalore</p>
+                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
+              </div>
+            </div>
+
+            {/* Profile Card 2 */}
+            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+              <div className="relative h-80 overflow-hidden">
+                <img src="/groom_1.png" alt="Rohan" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+              </div>
+              <div className="p-6 text-left">
+                <h3 className="text-xl font-serif text-slate-800 mb-1">Rohan, 28</h3>
+                <p className="text-slate-500 text-sm mb-4 italic">Accountant, Mumbai</p>
+                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
+              </div>
+            </div>
+
+            {/* Profile Card 3 */}
+            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+              <div className="relative h-80 overflow-hidden">
+                <img src="/bride_2.png" alt="Priya" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+              </div>
+              <div className="p-6 text-left">
+                <h3 className="text-xl font-serif text-slate-800 mb-1">Priya, 24</h3>
+                <p className="text-slate-500 text-sm mb-4 italic">UX Designer, Hyderabad</p>
+                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
+              </div>
+            </div>
+
+            {/* Profile Card 4 */}
+            <div className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+              <div className="relative h-80 overflow-hidden">
+                <img src="/groom_2.png" alt="Arjun" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-primary uppercase tracking-widest">Premium</div>
+              </div>
+              <div className="p-6 text-left">
+                <h3 className="text-xl font-serif text-slate-800 mb-1">Arjun, 30</h3>
+                <p className="text-slate-500 text-sm mb-4 italic">Marketing Manager, Delhi</p>
+                <button className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer">View Profile</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Stats */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+          <div>
+            <div className="text-4xl font-serif text-brand-primary mb-2">1M+</div>
+            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Happy Couples</div>
+          </div>
+          <div>
+            <div className="text-4xl font-serif text-brand-primary mb-2">25Yrs</div>
+            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Legacy of Trust</div>
+          </div>
+          <div>
+            <div className="text-4xl font-serif text-brand-primary mb-2">100%</div>
+            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Verified Profiles</div>
+          </div>
+          <div>
+            <div className="text-4xl font-serif text-brand-primary mb-2">Private</div>
+            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Secure Messaging</div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section id="about" className="py-24 px-6 bg-slate-50 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+          <div className="w-full md:w-1/2">
+            <div className="inline-block px-4 py-1.5 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
+              हमारे बारे में / About Us
+            </div>
+            <h2 className="text-4xl md:text-5xl font-serif text-slate-800 mb-8 leading-tight">
+              Sahu Parivar Matrimony <br />
+              <span className="text-brand-primary italic">Trusted by Sahu Society</span>
+            </h2>
+            <div className="space-y-8 text-slate-600 leading-relaxed">
+              <p className="text-lg">
+                <span className="font-bold text-slate-800 block mb-2">Sahu Parivar Matrimony साहू समाज के लिए एक समर्पित मंच है।</span>
+                We are a dedicated platform for the Sahu community, where familial values, traditions, and modernity blend seamlessly.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <div>
+                  <h3 className="text-brand-primary font-bold mb-2 flex items-center gap-2 uppercase text-xs tracking-widest">
+                    <span>हमारी विशेषताएं / Our Features</span>
+                  </h3>
+                  <p className="text-sm">
+                    सुरक्षित और विश्वसनीय प्रोफाइल: गहन सत्यापन प्रक्रिया। <br />
+                    <span className="text-slate-400 italic text-xs">Secure and Trusted Profiles: Rigorous verification process for every user.</span>
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-brand-primary font-bold mb-2 flex items-center gap-2 uppercase text-xs tracking-widest">
+                    <span>हमारा उद्देश्य / Our Vision</span>
+                  </h3>
+                  <p className="text-sm">
+                    हमारा उद्देश्य समाज के हर वर-वधू को उनके आदर्श जीवनसाथी से जोड़ना है। <br />
+                    <span className="text-slate-400 italic text-xs">Our goal is to connect every groom and bride of the community with their ideal life partner.</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-8 bg-brand-primary rounded-[2rem] text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <h4 className="text-xl font-serif mb-2">आपकी खुशी, हमारा मिशन</h4>
+                  <p className="text-sm opacity-90 italic">Your happiness is our mission. Together, let's build the future of the Sahu community.</p>
+                </div>
+                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="w-full md:w-1/2 relative bg-white p-4 rounded-[2.5rem] shadow-2xl border border-brand-primary/5">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 pt-12">
+                <div className="aspect-[4/5] bg-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                  <img src="/bride_ avatar_1_1774869909415.png" className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://ui-avatars.com/api/?background=800000&color=fff"; }} />
+                </div>
+                <div className="aspect-square bg-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                  <img src="/groom_ avatar_1_1774869926498.png" className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://ui-avatars.com/api/?background=f5f5dc&color=800000"; }} />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="aspect-square bg-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                  <img src="/bride_ avatar_2_1774869945651.png" className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://ui-avatars.com/api/?background=ffd700&color=000"; }} />
+                </div>
+                <div className="aspect-[4/5] bg-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                   <img src="/groom_ avatar_2_1774869963243.png" className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://ui-avatars.com/api/?background=800000&color=fff"; }} />
+                </div>
+              </div>
+            </div>
+            <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-3xl shadow-xl border border-slate-50 flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-0.5">Community Verified</div>
+                <div className="text-sm text-slate-700 font-bold">Authorized Platform</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default Home;

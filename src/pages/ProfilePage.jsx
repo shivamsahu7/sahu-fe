@@ -1,24 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getProfileDetails } from '../services/profileService';
+import { isAuthenticated } from '../services/authService';
+import EditProfileModal from '../components/profile/EditProfileModal';
 
-const ProfileModal = ({ isOpen, onClose, profileData }) => {
-  if (!isOpen || !profileData) return null;
+const ProfilePage = () => {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const data = await getProfileDetails();
+      setProfileData(data);
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/');
+      return;
+    }
+
+    fetchProfile();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-accent">
+        <div className="flex flex-col items-center gap-4">
+          <svg className="animate-spin h-10 w-10 text-brand-primary" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-slate-500 font-medium animate-pulse uppercase tracking-[0.2em] text-xs">Loading Profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-accent">
+        <p className="text-slate-500">Failed to load profile details.</p>
+      </div>
+    );
+  }
 
   const { data: profile } = profileData;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-300 flex flex-col">
+    <div className="min-h-screen bg-brand-accent py-12 px-6">
+      <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col">
         {/* Header/Banner Area */}
         <div className="relative h-48 bg-gradient-to-r from-brand-primary to-brand-primary-dark shrink-0">
-          <button 
-            onClick={onClose}
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/20 hover:bg-white/40 transition-colors z-10 text-white"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          
           <div className="absolute -bottom-16 left-12 p-1 bg-white rounded-full shadow-xl">
             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-slate-100">
               <img 
@@ -31,16 +72,20 @@ const ProfileModal = ({ isOpen, onClose, profileData }) => {
           </div>
         </div>
 
-        {/* Content Area - Scrollable */}
-        <div className="flex-1 overflow-y-auto pt-20 px-12 pb-12 custom-scrollbar">
+        {/* Content Area */}
+        <div className="pt-20 px-12 pb-12">
           <div className="flex justify-between items-start mb-10">
             <div>
               <h2 className="text-4xl font-serif text-slate-800 mb-1">{profile.first_name} {profile.last_name}</h2>
               <p className="text-brand-primary font-semibold tracking-wide uppercase text-xs">Sahu Community Member</p>
             </div>
             <div className="flex gap-3">
-              <button className="px-6 py-2.5 bg-brand-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all">Edit Profile</button>
-              <button className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">Settings</button>
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-6 py-2.5 bg-brand-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all"
+              >
+                Edit Profile
+              </button>
             </div>
           </div>
 
@@ -59,8 +104,12 @@ const ProfileModal = ({ isOpen, onClose, profileData }) => {
                     <span className="text-slate-700 font-medium">{profile.date_of_birth || 'Not specified'}</span>
                   </li>
                   <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Phone Number</span>
-                    <span className="text-slate-700 font-medium font-mono">{profile.phone || 'Not specified'}</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Rashi</span>
+                    <span className="text-slate-700 font-medium">{profile.rashi_name || 'Not specified'}</span>
+                  </li>
+                  <li className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Complexion</span>
+                    <span className="text-slate-700 font-medium">{profile.color_name || 'Not specified'}</span>
                   </li>
                 </ul>
               </div>
@@ -69,12 +118,20 @@ const ProfileModal = ({ isOpen, onClose, profileData }) => {
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Contact Info</h3>
                 <ul className="space-y-4">
                   <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Address</span>
-                    <span className="text-slate-700 font-medium text-sm leading-relaxed">{profile.address || 'Not specified'}</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Location</span>
+                    <span className="text-slate-700 font-medium text-sm leading-relaxed">
+                      {profile.city_name}, {profile.district_name}, {profile.state_name}
+                    </span>
                   </li>
                   <li className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Village</span>
-                    <span className="text-slate-700 font-medium">{profile.village || 'Not specified'}</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Village & Address</span>
+                    <span className="text-slate-700 font-medium text-xs">
+                      {profile.village}, {profile.address}
+                    </span>
+                  </li>
+                  <li className="flex flex-col pt-2">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Phone</span>
+                    <span className="text-slate-700 font-medium font-mono">{profile.phone}</span>
                   </li>
                 </ul>
               </div>
@@ -107,12 +164,18 @@ const ProfileModal = ({ isOpen, onClose, profileData }) => {
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Education & Career</h3>
                 <ul className="space-y-4">
                   <li className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Education</span>
+                    <span className="text-slate-700 font-medium">{profile.education_name || 'Graduate'}</span>
+                    <span className="text-[10px] text-slate-500">{profile.education_detail}</span>
+                  </li>
+                  <li className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">Occupation</span>
-                    <span className="text-slate-700 font-medium">{profile.occupation_detail || 'Self Employed / Professional'}</span>
+                    <span className="text-slate-700 font-medium">{profile.occupation_name || 'Professional'}</span>
+                    <span className="text-[10px] text-slate-500">{profile.occupation_detail}</span>
                   </li>
                   <li className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">Monthly Income</span>
-                    <span className="text-slate-700 font-medium">{profile.monthly_salary ? `₹${profile.monthly_salary}` : 'Private'}</span>
+                    <span className="text-brand-primary font-bold">{profile.monthly_salary ? `₹${profile.monthly_salary}` : 'Private'}</span>
                   </li>
                 </ul>
               </div>
@@ -132,8 +195,15 @@ const ProfileModal = ({ isOpen, onClose, profileData }) => {
           <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Profiles verified with Eternal Bonds Matrimony</p>
         </div>
       </div>
+
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        initialData={profileData}
+        onUpdateSuccess={fetchProfile}
+      />
     </div>
   );
 };
 
-export default ProfileModal;
+export default ProfilePage;

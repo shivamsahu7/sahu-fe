@@ -10,3 +10,13 @@ export const getProfileDetails = async () => {
     throw new Error(message);
   }
 };
+export const updateProfile = async (stepData) => {
+  try {
+    const response = await apiClient.post('/user/profile/update-profile', stepData);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to update profile';
+    console.error('Profile Update Error:', message);
+    throw new Error(message);
+  }
+};
