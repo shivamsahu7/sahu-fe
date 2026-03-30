@@ -1,24 +1,29 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import apiClient from './apiClient';
 
 export const login = async (email, password) => {
   try {
-    const response = await api.post('/user/auth/login', { email, password });
+    const response = await apiClient.post('/user/auth/login', { email, password });
     
-    // Axios returns the data directly in response.data
-    // Swagger says 200 OK has No Body, so we just check the status
+    // Extract token from Authorization header if present
+    const authHeader = response.headers.authorization || response.headers.Authorization;
+    if (authHeader) {
+      // Remove 'Bearer ' prefix if it exists
+      const token = authHeader.replace(/^Bearer\s+/i, '');
+      localStorage.setItem('token', token);
+    }
+    
     return { success: true, status: response.status, data: response.data };
   } catch (error) {
     const message = error.response?.data?.message || error.message || 'Login failed';
     console.error('Login Error:', message);
     throw new Error(message);
   }
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
+};
+
+export const isAuthenticated = () => {
+  return !!localStorage.getItem('token');
 };

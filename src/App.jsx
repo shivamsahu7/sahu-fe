@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Login from './components/auth/Login'
 import ProfileModal from './components/profile/ProfileModal'
 import { getProfileDetails } from './services/profileService'
+import { isAuthenticated, logout } from './services/authService'
 import './App.css'
 
 function App() {
@@ -11,10 +12,22 @@ function App() {
   const [profileData, setProfileData] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
 
+  useEffect(() => {
+    // Check if user is already logged in on mount
+    if (isAuthenticated()) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    // Fetch profile details immediately after login success if needed
-    // fetchProfile(); 
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    setProfileData(null);
+    setIsProfileOpen(false);
   };
 
   const fetchProfile = async () => {
@@ -42,23 +55,34 @@ function App() {
         </div>
         <div className="flex gap-4">
           {isLoggedIn ? (
-            <button 
-              onClick={fetchProfile}
-              disabled={loadingProfile}
-              className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2 disabled:opacity-50"
-            >
-              {loadingProfile ? (
-                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <div className="flex gap-3">
+              <button 
+                onClick={fetchProfile}
+                disabled={loadingProfile}
+                className="px-6 py-2 text-sm font-semibold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer flex items-center gap-2 disabled:opacity-50"
+              >
+                {loadingProfile ? (
+                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                )}
+                {loadingProfile ? 'Loading...' : 'My Profile'}
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                title="Logout"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              )}
-              {loadingProfile ? 'Loading...' : 'My Profile'}
-            </button>
+              </button>
+            </div>
           ) : (
             <>
               <button 
