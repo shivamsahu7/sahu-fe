@@ -59,11 +59,11 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
         {/* Hero Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <h1 className="text-5xl md:text-7xl font-serif text-slate-800 mb-2 leading-tight">
-            Begin Your Journey to <br />
-            <span className="italic text-brand-primary font-light">Everlasting Love</span>
+            Find Your Life Partner <br />
+            <span className="italic text-brand-primary font-light">on SahuSaathi</span>
           </h1>
           <h2 className="text-xl md:text-2xl font-serif text-brand-primary/80 mb-6">
-            अनंत प्रेम की अपनी यात्रा शुरू करें
+            सच्चे रिश्तों की शुरुआत, sahu saathi के साथ
           </h2>
           <p className="text-lg md:text-xl text-slate-600 mb-2 max-w-2xl mx-auto">
             The world's most trusted matrimony site.
@@ -242,12 +242,12 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
               हमारे बारे में / About Us
             </div>
             <h2 className="text-4xl md:text-5xl font-serif text-slate-800 mb-8 leading-tight">
-              Sahu Parivar Matrimony <br />
+              SahuSaathi Matrimony <br />
               <span className="text-brand-primary italic">Trusted by Sahu Society</span>
             </h2>
             <div className="space-y-8 text-slate-600 leading-relaxed">
               <p className="text-lg">
-                <span className="font-bold text-slate-800 block mb-2">Sahu Parivar Matrimony साहू समाज के लिए एक समर्पित मंच है।</span>
+                <span className="font-bold text-slate-800 block mb-2">SahuSaathi साहू समाज के लिए एक समर्पित मंच है।</span>
                 We are a dedicated platform for the Sahu community, where familial values, traditions, and modernity blend seamlessly.
               </p>
               

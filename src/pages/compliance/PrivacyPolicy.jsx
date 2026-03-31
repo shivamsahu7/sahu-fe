@@ -9,7 +9,7 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">1. Information Collection</h2>
             <p>
-              We collect personal information that you provide to us when you register on the Eternal Bonds Matrimony website. This includes but is not limited to your name, contact information, date of birth, gender, occupation, and family details.
+              We collect personal information that you provide to us when you register on the SahuSaathi website. This includes but is not limited to your name, contact information, date of birth, gender, occupation, and family details.
             </p>
           </section>
 

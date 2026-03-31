@@ -42,7 +42,7 @@ const ContactUs = () => {
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Our Office</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                Eternal Bonds Matrimony HQ<br />
+                SahuSaathi HQ<br />
                 Sahu Community Center, 4th Floor<br />
                 Civil Lines, Raipur, Chhattisgarh<br />
                 India - 492001

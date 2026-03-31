@@ -8,28 +8,28 @@ const Disclaimer = () => {
         <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed space-y-6">
           <section>
             <p>
-              The information contained on the Eternal Bonds Matrimony website is for general information purposes only. Eternal Bonds Matrimony assumes no responsibility for errors or omissions in the contents of the service.
+              The information contained on the SahuSaathi website is for general information purposes only. SahuSaathi assumes no responsibility for errors or omissions in the contents of the service.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">1. Errors and Omissions</h2>
             <p>
-              In no event shall Eternal Bonds Matrimony be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, whether in an action of contract, negligence, or other tort, arising out of or in connection with the use of the service or the contents of the service.
+              In no event shall SahuSaathi be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, whether in an action of contract, negligence, or other tort, arising out of or in connection with the use of the service or the contents of the service.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">2. External Links Disclaimer</h2>
             <p>
-              The Service may contain links to external websites that are not provided or maintained by or in any way affiliated with Eternal Bonds Matrimony. Please note that Eternal Bonds Matrimony does not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.
+              The Service may contain links to external websites that are not provided or maintained by or in any way affiliated with SahuSaathi. Please note that SahuSaathi does not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">3. Profile Authenticity Disclaimer</h2>
             <p>
-              While we strive to maintain high standards of profile verification, Eternal Bonds Matrimony does not verify every single detail provided by users. Users are advised to conduct their own independent verification before entering into any matrimonial alliance.
+              While we strive to maintain high standards of profile verification, SahuSaathi does not verify every single detail provided by users. Users are advised to conduct their own independent verification before entering into any matrimonial alliance.
             </p>
           </section>
 

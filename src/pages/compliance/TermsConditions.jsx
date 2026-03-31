@@ -9,7 +9,7 @@ const TermsConditions = () => {
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">1. Acceptance of Terms</h2>
             <p>
-              By accessing and using the Eternal Bonds Matrimony website, you agree to comply with and be bound by these Terms and Conditions. If you do not agree, please do not use our services.
+              By accessing and using the SahuSaathi website, you agree to comply with and be bound by these Terms and Conditions. If you do not agree, please do not use our services.
             </p>
           </section>
 
@@ -37,7 +37,7 @@ const TermsConditions = () => {
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4 uppercase tracking-widest text-xs">5. Limitation of Liability</h2>
             <p>
-              Eternal Bonds Matrimony will not be liable for any damages arising out of the use or inability to use our services. We do not guarantee the accuracy of any user-provided information.
+              SahuSaathi will not be liable for any damages arising out of the use or inability to use our services. We do not guarantee the accuracy of any user-provided information.
             </p>
           </section>
 

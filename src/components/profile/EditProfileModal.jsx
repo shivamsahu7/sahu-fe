@@ -389,51 +389,53 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gallery / गैलरी</p>
                   </div>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                     {mediaList.map((media) => {
                       const currentId = media.media_id || media.id;
                       const isSelected = Number(formData.media_id) === Number(currentId);
 
                       return (
-                        <div
-                          key={currentId}
-                          className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                            isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
-                          }`}
-                          onClick={async () => {
-                            try {
-                              await updateProfileImage(currentId);
-                              setFormData(prev => ({ ...prev, media_id: currentId }));
-                              if (onUpdateSuccess) onUpdateSuccess();
-                            } catch (error) {
-                              console.error("Failed to update profile image:", error);
-                            }
-                          }}
-                        >
-                          <img src={media.fullUrl || media.url || media.file_path} alt="Gallery item" className="w-full h-full object-cover" />
-                          
-                          {/* Profile Image Selection Overlay */}
-                          {isSelected && (
-                            <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
-                              <div className="bg-brand-primary rounded-full p-1.5 shadow-lg">
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                                </svg>
+                        <div key={currentId} className="flex flex-col gap-2">
+                          <div
+                            className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                              isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-transparent hover:border-slate-300'
+                            }`}
+                            onClick={async () => {
+                              try {
+                                await updateProfileImage(currentId);
+                                setFormData(prev => ({ ...prev, media_id: currentId }));
+                                if (onUpdateSuccess) onUpdateSuccess();
+                              } catch (error) {
+                                console.error("Failed to update profile image:", error);
+                              }
+                            }}
+                          >
+                            <img src={media.fullUrl || media.url || media.file_path} alt="Gallery" className="w-full h-full object-cover" />
+                            
+                            {/* Profile Image Selection Overlay */}
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center pointer-events-none">
+                                <div className="bg-brand-primary rounded-full p-1.5 shadow-lg">
+                                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
 
-                          {/* Delete Icon */}
+                          {/* Delete Button - Moved Below Image */}
                           {!isSelected && (
-                            <div 
+                            <button 
                               onClick={(e) => handleDeleteMedia(e, currentId)}
-                              className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 hover:bg-red-500 hover:text-white text-red-500 rounded-lg shadow-md flex items-center justify-center transition-all z-10"
+                              className="w-full py-1 text-[9px] font-bold text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-lg transition-all flex items-center justify-center gap-1 border border-red-100"
                               title="Delete Photo"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
-                            </div>
+                              Delete
+                            </button>
                           )}
                         </div>
                       );

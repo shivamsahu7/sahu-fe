@@ -142,8 +142,8 @@ const PublicProfile = () => {
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: `${profile.first_name} ${profile.last_name} - Eternal Bonds Matrimony`,
-                        text: `Check out ${profile.first_name}'s matrimony profile on Eternal Bonds!`,
+                        title: `${profile.first_name} ${profile.last_name} - SahuSaathi`,
+                        text: `Check out ${profile.first_name}'s matrimony profile on SahuSaathi!`,
                         url: window.location.href,
                       });
                     } catch (error) {

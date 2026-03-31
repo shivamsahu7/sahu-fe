@@ -79,12 +79,12 @@ function App() {
             <span className="text-white font-serif text-xl md:text-2xl font-bold italic">S</span>
           </div>
           <div className="text-left hidden sm:block">
-            <span className="block text-lg md:text-xl font-serif text-slate-800 font-bold leading-none">Eternal Bonds</span>
-            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">Sahu Matrimony</span>
+            <span className="block text-lg md:text-xl font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
+            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
           <div className="text-left sm:hidden">
-            <span className="block text-base font-serif text-slate-800 font-bold leading-none">Eternal Bonds</span>
-            <span className="text-[8px] uppercase tracking-[0.1em] text-brand-primary font-bold">Sahu Matrimony</span>
+            <span className="block text-base font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
+            <span className="text-[8px] uppercase tracking-[0.1em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
         </Link>
 
@@ -169,8 +169,8 @@ function App() {
                 <span className="text-brand-primary font-serif text-2xl font-bold italic">S</span>
               </div>
               <div className="text-left">
-                <span className="block text-xl font-serif text-white font-bold leading-none">Eternal Bonds</span>
-                <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">Sahu Matrimony</span>
+                <span className="block text-xl font-serif text-white font-bold leading-none">Sahu Saathi</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">SahuSaathi</span>
               </div>
             </div>
             <p className="text-slate-400 text-sm max-w-md leading-relaxed mb-8">
@@ -195,7 +195,7 @@ function App() {
           </div>
         </div>
         <div className="max-w-6xl mx-auto pt-12 mt-12 border-t border-white/5 text-center text-slate-500 text-xs tracking-widest uppercase font-bold">
-          © 2026 Eternal Bonds Matrimony. All Rights Reserved.
+          © 2026 SahuSaathi. All Rights Reserved.
         </div>
         
         {/* Background Decor */}

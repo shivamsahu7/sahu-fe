@@ -43,7 +43,7 @@ const AboutUs = () => {
           <div className="pt-8">
             <h2 className="text-2xl font-serif text-slate-800 mb-4">Our Legacy</h2>
             <p>
-              With over 20 years of experience in the matchmaking industry, Eternal Bonds Matrimony has become a household name within the Sahu community. We take pride in having facilitated thousands of successful marriages, built on a foundation of trust and cultural alignment.
+              With over 20 years of experience in the matchmaking industry, SahuSaathi has become a household name within the Sahu community. We take pride in having facilitated thousands of successful marriages, built on a foundation of trust and cultural alignment.
             </p>
           </div>
 

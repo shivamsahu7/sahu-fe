@@ -342,7 +342,7 @@ const ProfilePage = () => {
 
         {/* Footer actions */}
         <div className="p-8 border-t border-slate-100 bg-white shrink-0 text-center">
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Profiles verified with Eternal Bonds Matrimony</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Profiles verified with SahuSaathi</p>
         </div>
       </div>
 
