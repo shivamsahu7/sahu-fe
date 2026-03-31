@@ -232,7 +232,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
       // Validate current step
       const requiredFields = {
         1: ['first_name', 'last_name', 'phone', 'state_id', 'district_id', 'city_id', 'village', 'address', 'permanent_address'],
-        2: ['gender', 'date_of_birth', 'birth_time', 'height', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
+        2: ['date_of_birth', 'birth_time', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
         3: ['father_name', 'mother_name'], // Minimal family validation
         4: ['education_id', 'occupation_id'], // Minimal career validation
         5: ['introduction']
@@ -548,7 +548,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Birth Time</label>
-                <input type="time" name="birth_time" step="1" value={formData.birth_time || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['birth_time'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                <input type="time" name="birth_time" value={formData.birth_time || ''} onChange={handleChange} onClick={(e) => e.target.showPicker && e.target.showPicker()} lang="en-GB" className={"p-3 bg-slate-50 rounded-xl border cursor-pointer outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['birth_time'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
               
                 {fieldErrors['birth_time'] && <p className="text-[10px] text-red-500 font-bold mt-1">Birth Time is required</p>}
               </div>

@@ -76,8 +76,8 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
                 onChange={(e) => setFilters(prev => ({ ...prev, gender: e.target.value }))}
                 className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
               >
-                <option value="female">Bride</option>
-                <option value="male">Groom</option>
+                <option value="female">Bride (वधू)</option>
+                <option value="male">Groom (वर)</option>
               </select>
             </div>
             <div className="flex flex-col items-start px-4">
