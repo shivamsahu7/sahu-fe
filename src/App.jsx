@@ -151,7 +151,7 @@ function App() {
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/user/:slug" element={<PublicProfile />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password/:email/:token" element={<ResetPassword />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsConditions />} />

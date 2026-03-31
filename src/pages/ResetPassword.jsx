@@ -1,28 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { resetPassword } from '../services/authService';
 
 const ResetPassword = () => {
-  const [searchParams] = useSearchParams();
+  const { email, token } = useParams();
   const navigate = useNavigate();
   
-  const [email, setEmail] = useState('');
-  const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    // Extract email and token from URL query parameters
-    const urlEmail = searchParams.get('email');
-    const urlToken = searchParams.get('token');
-    
-    if (urlEmail) setEmail(urlEmail);
-    if (urlToken) setToken(urlToken);
-  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

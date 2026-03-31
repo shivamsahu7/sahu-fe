@@ -25,9 +25,13 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only reload/logout if it's NOT a login attempt that failed
+    // This allows the login form to show the "Invalid password" error instead of refreshing
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    
+    if (error.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem('token');
-      window.location.reload(); // Simple way to reset app state on logout
+      window.location.reload(); 
     }
     return Promise.reject(error);
   }
