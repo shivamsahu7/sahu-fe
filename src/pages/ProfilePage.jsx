@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { getProfileDetails } from '../services/profileService';
 import { isAuthenticated } from '../services/authService';
 import EditProfileModal from '../components/profile/EditProfileModal';
@@ -316,6 +316,29 @@ const ProfilePage = () => {
             </div>
           </div>
         )}
+        
+        {/* Support CTA */}
+        <div className="px-6 md:px-12 pb-12">
+          <div className="bg-brand-primary/5 p-6 rounded-[2rem] border border-brand-primary/10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm shrink-0">
+                <svg className="w-6 h-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-800">Facing any problem? / कोई समस्या आ रही है?</h4>
+                <p className="text-xs text-slate-500">Please let us know if you encounter any issues. / यदि आपको कोई समस्या आती है तो कृपया हमें बताएं।</p>
+              </div>
+            </div>
+            <Link 
+              to="/contact" 
+              className="px-8 py-3 bg-white text-brand-primary border border-brand-primary/20 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all shadow-sm"
+            >
+              Write Message / यहाँ लिखें
+            </Link>
+          </div>
+        </div>
 
         {/* Footer actions */}
         <div className="p-8 border-t border-slate-100 bg-white shrink-0 text-center">
