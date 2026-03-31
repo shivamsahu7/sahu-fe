@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { updateProfile, getMediaList, uploadMedia, deleteMedia, updateProfileImage } from '../../services/profileService';
 import { 
   getLocations, 
@@ -187,6 +188,12 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
         val = '';
       } else {
         val = name === 'height' ? parseFloat(value) : parseInt(value, 10);
+        
+        // Prevent negative values for counts and salary
+        const nonNegativeFields = ['number_of_brother', 'number_of_married_brother', 'number_of_sister', 'number_of_married_sister', 'monthly_salary'];
+        if (nonNegativeFields.includes(name) || name === 'monthly_salary') {
+          val = Math.max(0, val);
+        }
       }
     }
     
@@ -274,6 +281,13 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
           }
         });
       } else if (step === 3) {
+        if (formData.father_phone_number && formData.father_phone_number.length !== 10) {
+          setError("Father's phone number must be exactly 10 digits.");
+          setFieldErrors({ father_phone_number: true });
+          setLoading(false);
+          return;
+        }
+
         const fields = ['father_name', 'mother_name', 'father_occupation', 'mother_occupation', 'father_phone_number', 'number_of_brother', 'number_of_married_brother', 'about_brother', 'number_of_sister', 'number_of_married_sister', 'about_sister'];
         fields.forEach(f => {
           const val = formData[f];
@@ -434,6 +448,29 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               </div>
             </div>
 
+            {/* Feedback / Support CTA */}
+            <div className="p-5 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 flex items-start gap-4">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                <svg className="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-slate-800 mb-1">Facing any issue / कोई समस्या?</h4>
+                <p className="text-xs text-slate-500 leading-relaxed mb-3">If you have any problem updating your profile, please write to us. / अगर आपको प्रोफाइल अपडेट करने में कोई समस्या आ रही है, तो कृपया हमें लिखें।</p>
+                <Link 
+                  to="/contact" 
+                  onClick={onClose}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-brand-primary hover:text-brand-primary-dark transition-colors"
+                >
+                  Write Here / यहाँ लिखें
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
             {mode !== 'image-only' && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -570,7 +607,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 >
                   <option value="">Select Rashi</option>
                   {rashis.map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
+                    <option key={r.id} value={r.id}>{r.name} {r.hi_name ? `(${r.hi_name})` : ''}</option>
                   ))}
                 </select>
               
@@ -586,7 +623,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 >
                   <option value="">Select Color</option>
                   {colors.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id}>{c.name} {c.hi_name ? `(${c.hi_name})` : ''}</option>
                   ))}
                 </select>
               
@@ -643,7 +680,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Father's Phone</label>
-              <input name="father_phone_number" maxLength={20} value={formData.father_phone_number || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['father_phone_number'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              <input 
+                name="father_phone_number" 
+                maxLength={10} 
+                placeholder="10-digit number"
+                value={formData.father_phone_number || ''} 
+                onChange={e => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setFormData(prev => ({ ...prev, father_phone_number: val }));
+                  if (fieldErrors['father_phone_number']) setFieldErrors(prev => ({ ...prev, father_phone_number: false }));
+                }} 
+                className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['father_phone_number'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
+              />
             
                 {fieldErrors['father_phone_number'] && <p className="text-[10px] text-red-500 font-bold mt-1">Father's Phone is required</p>}
               </div>
@@ -652,6 +700,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 <label className="text-[10px] font-bold uppercase text-slate-400">Brothers</label>
                 <input 
                   type="number" 
+                  min="0"
                   name="number_of_brother" 
                   value={formData.number_of_brother ?? 0} 
                   onChange={handleChange} 
@@ -664,7 +713,8 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Brothers</label>
                 <input 
-                  type="number" 
+                   type="number" 
+                   min="0"
                   name="number_of_married_brother" 
                   value={formData.number_of_married_brother ?? 0} 
                   onChange={handleChange} 
@@ -686,6 +736,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 <label className="text-[10px] font-bold uppercase text-slate-400">Sisters</label>
                 <input 
                   type="number" 
+                  min="0"
                   name="number_of_sister" 
                   value={formData.number_of_sister ?? 0} 
                   onChange={handleChange} 
@@ -699,6 +750,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Sisters</label>
                 <input 
                   type="number" 
+                  min="0"
                   name="number_of_married_sister" 
                   value={formData.number_of_married_sister ?? 0} 
                   onChange={handleChange} 
@@ -769,6 +821,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               <label className="text-[10px] font-bold uppercase text-slate-400">Monthly Salary (₹)</label>
               <input 
                 type="number" 
+                min="0"
                 name="monthly_salary" 
                 value={formData.monthly_salary ?? 0} 
                 onChange={handleChange} 

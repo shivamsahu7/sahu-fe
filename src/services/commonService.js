@@ -38,3 +38,18 @@ export const getEducations = () => fetchCommonData('/user/common/education');
 export const getOccupations = () => fetchCommonData('/user/common/occupation');
 export const getRashis = () => fetchCommonData('/user/common/rashi');
 export const getColors = () => fetchCommonData('/user/common/colors');
+
+/**
+ * Submit user feedback
+ * @param {Object} feedbackData - { name, email, data }
+ */
+export const submitFeedback = async (feedbackData) => {
+  try {
+    const response = await apiClient.post('/user/feedback/', feedbackData);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to submit feedback';
+    console.error('Feedback Submission Error:', message);
+    throw new Error(message);
+  }
+};
