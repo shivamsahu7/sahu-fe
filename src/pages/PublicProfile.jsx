@@ -36,7 +36,7 @@ const PublicProfile = () => {
       try {
         setLoading(true);
         const data = await userService.fetchUserProfile(slug);
-        setProfile(data.data || data); // Depending on API response structure
+        setProfile(data.data || data);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. The user may not exist or the link is invalid.");
@@ -115,7 +115,7 @@ const PublicProfile = () => {
             </div>
             
             <div className="flex-1 text-center md:text-left pt-4 md:pt-0">
-              <div className="inline-block px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold tracking-widest uppercase mb-2">Verified Profile</div>
+              {profile.is_approved && <div className="inline-block px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold tracking-widest uppercase mb-2">Verified Profile</div>}
               <h1 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-2">
                 {profile.first_name} {profile.last_name}
               </h1>
@@ -197,7 +197,10 @@ const PublicProfile = () => {
               </div>
               <div className="flex justify-between border-b border-slate-50 pb-2">
                 <span className="text-slate-500">Complexion</span>
-                <span className="font-medium text-slate-800 capitalize">{profile.color_name || 'Not Specified'}</span>
+                <span className="font-medium text-slate-800 capitalize">
+                  {profile.color_name || 'Not Specified'} 
+                  {profile.color_hi_name && <span className="text-slate-400 font-normal ml-1">({profile.color_hi_name})</span>}
+                </span>
               </div>
             </div>
           </div>
@@ -245,10 +248,16 @@ const PublicProfile = () => {
                 <span className="text-slate-500">City</span>
                 <span className="font-medium text-slate-800">{profile.city_name || 'Not Specified'}</span>
               </li>
-              <li className="flex justify-between pb-3">
+              <li className="flex justify-between border-b border-slate-50 pb-3">
                 <span className="text-slate-500">Village</span>
                 <span className="font-medium text-slate-800">{profile.village || 'Not Specified'}</span>
               </li>
+              {profile.permanent_address && (
+                <li className="flex flex-col pt-3">
+                  <span className="text-slate-500 text-xs mb-1">Permanent Address</span>
+                  <p className="text-slate-700 font-medium leading-relaxed">{profile.permanent_address}</p>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -264,8 +273,20 @@ const PublicProfile = () => {
                 <h4 className="text-slate-800 font-bold mb-4 uppercase text-xs tracking-widest text-brand-primary">Family Details</h4>
                 <ul className="space-y-3 text-sm">
                   <li className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">Father's Name</span>
+                    <span className="font-medium text-slate-800 text-right">{profile.father_name || 'Not Specified'}</span>
+                  </li>
+                  <li className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">Father's Phone</span>
+                    <span className="font-medium text-slate-800 text-right">{profile.father_phone_number || profile.fatherPhoneNumber || 'Not Specified'}</span>
+                  </li>
+                  <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Father's Occupation</span>
                     <span className="font-medium text-slate-800 text-right">{profile.father_occupation || 'Not Specified'}</span>
+                  </li>
+                  <li className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">Mother's Name</span>
+                    <span className="font-medium text-slate-800 text-right">{profile.mother_name || 'Not Specified'}</span>
                   </li>
                   <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Mother's Occupation</span>
@@ -292,6 +313,10 @@ const PublicProfile = () => {
                 <h4 className="text-slate-800 font-bold mb-4 uppercase text-xs tracking-widest text-brand-primary">Astrological Details</h4>
                 <ul className="space-y-3 text-sm">
                   <li className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">Birth Time</span>
+                    <span className="font-medium text-slate-800">{profile.birth_time || profile.birthTime || 'Not Specified'}</span>
+                  </li>
+                  <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Gotra</span>
                     <span className="font-medium text-slate-800 capitalize">{profile.gotr || 'Not Specified'}</span>
                   </li>
@@ -301,7 +326,10 @@ const PublicProfile = () => {
                   </li>
                   <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Rashi</span>
-                    <span className="font-medium text-slate-800 capitalize">{profile.rashi_name || 'Not Specified'}</span>
+                    <span className="font-medium text-slate-800 capitalize">
+                      {profile.rashi_name || 'Not Specified'}
+                      {profile.rashi_hi_name && <span className="text-slate-400 font-normal ml-1">({profile.rashi_hi_name})</span>}
+                    </span>
                   </li>
                   <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Manglik Dosh</span>
