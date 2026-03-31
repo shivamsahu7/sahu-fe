@@ -6,7 +6,8 @@ import {
   getEducations, 
   getOccupations, 
   getRashis, 
-  getColors 
+  getColors,
+  getMaritalStatuses 
 } from '../../services/commonService';
 
 const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode = 'full' }) => {
@@ -26,6 +27,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
   const [colors, setColors] = useState([]);
   const [educations, setEducations] = useState([]);
   const [occupations, setOccupations] = useState([]);
+  const [maritalStatuses, setMaritalStatuses] = useState([]);
   
   const [mediaList, setMediaList] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -134,16 +136,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
 
   const fetchLookups = async () => {
     try {
-      const [r, c, e, o] = await Promise.all([
+      const [r, c, e, o, m] = await Promise.all([
         getRashis(),
         getColors(),
         getEducations(),
-        getOccupations()
+        getOccupations(),
+        getMaritalStatuses()
       ]);
       setRashis(r.data || []);
       setColors(c.data || []);
       setEducations(e.data || []);
       setOccupations(o.data || []);
+      setMaritalStatuses(m.data || []);
     } catch (err) {
       console.error('Failed to fetch lookup data');
     }
@@ -239,7 +243,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
       // Validate current step
       const requiredFields = {
         1: ['first_name', 'last_name', 'phone', 'state_id', 'district_id', 'city_id', 'address', 'permanent_address'],
-        2: ['date_of_birth', 'birth_time', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
+        2: ['gender', 'date_of_birth', 'birth_time', 'marital_status_id', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
         3: ['father_name', 'mother_name'], // Minimal family validation
         4: ['education_id', 'occupation_id'], // Minimal career validation
         5: ['introduction']
@@ -269,7 +273,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
           }
         });
       } else if (step === 2) {
-        const fields = ['gender', 'date_of_birth', 'birth_time', 'height', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'];
+        const fields = ['gender', 'date_of_birth', 'birth_time', 'height', 'rashi_id', 'color_id', 'gotr', 'mama_gotr', 'marital_status_id'];
         fields.forEach(f => {
           const val = formData[f];
           if (f.endsWith('_id')) {
@@ -581,6 +585,23 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               
                 {fieldErrors['date_of_birth'] && <p className="text-[10px] text-red-500 font-bold mt-1">Date of Birth is required</p>}
               </div>
+            </div>
+            
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold uppercase text-slate-400">Marital Status / वैवाहिक स्थिति</label>
+              <select 
+                name="marital_status_id" 
+                value={formData.marital_status_id || ''} 
+                onChange={handleChange} 
+                className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['marital_status_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
+              >
+                <option value="">Select Marital Status</option>
+                {maritalStatuses.map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            
+              {fieldErrors['marital_status_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">Marital Status is required</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">

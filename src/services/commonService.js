@@ -38,6 +38,7 @@ export const getEducations = () => fetchCommonData('/user/common/education');
 export const getOccupations = () => fetchCommonData('/user/common/occupation');
 export const getRashis = () => fetchCommonData('/user/common/rashi');
 export const getColors = () => fetchCommonData('/user/common/colors');
+export const getMaritalStatuses = () => fetchCommonData('/user/common/marital-status');
 
 /**
  * Submit user feedback

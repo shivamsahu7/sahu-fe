@@ -189,7 +189,7 @@ const PublicProfile = () => {
               </div>
               <div className="flex justify-between border-b border-slate-50 pb-2">
                 <span className="text-slate-500">Marital Status</span>
-                <span className="font-medium text-slate-800 capitalize">{profile.marital_status || 'Not Specified'}</span>
+                <span className="font-medium text-slate-800 capitalize">{profile.marital_status_name || profile.marital_status || 'Not Specified'}</span>
               </div>
               <div className="flex justify-between border-b border-slate-50 pb-2">
                 <span className="text-slate-500">Disability Status</span>

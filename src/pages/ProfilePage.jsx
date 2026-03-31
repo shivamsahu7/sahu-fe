@@ -219,6 +219,7 @@ const ProfilePage = () => {
                   <DetailItem label="Time of Birth" value={profile.birth_time} />
                   <DetailItem label="Rashi" value={profile.rashi_name} />
                   <DetailItem label="Complexion" value={profile.color_name} />
+                  <DetailItem label="Marital Status" value={profile.marital_status_name} />
                   <DetailItem label="Gotr" value={profile.gotr} highlight />
                   <DetailItem label="Mama Gotr" value={profile.mama_gotr} highlight />
                   <DetailItem label="Manglik" value={profile.manglik_dosh ? 'Yes' : 'No'} />
