@@ -112,7 +112,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
               onClick={handleSearch}
               className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-xl shadow-brand-primary/20 cursor-pointer"
             >
-              Let's Begin
+              Search
             </button>
           </div>
         </div>

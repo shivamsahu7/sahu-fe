@@ -218,7 +218,7 @@ const ProfilePage = () => {
                   Location & Address
                 </h3>
                 <div className="space-y-4">
-                  <DetailItem label="Current City" value={`${profile.city_name}, ${profile.state_name}`} />
+                  <DetailItem label="Current City" value={[profile.city_name, profile.state_name].filter(Boolean).join(', ')} />
                   <div>
                     <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Full Address</span>
                     <p className="text-slate-700 font-medium text-sm leading-relaxed">

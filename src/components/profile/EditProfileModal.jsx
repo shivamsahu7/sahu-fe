@@ -13,6 +13,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   
   // Location states
   const [states, setStates] = useState([]);
@@ -215,11 +216,16 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
       ...prev,
       [name]: val
     }));
+
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleNext = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -234,7 +240,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
 
       const missing = requiredFields[step]?.filter(f => !formData[f]);
       if (missing && missing.length > 0) {
-        throw new Error(`Please fill all required fields: ${missing.map(f => f.replace(/_/g, ' ')).join(', ')}`);
+        const errors = {};
+        missing.forEach(f => { errors[f] = true; });
+        setFieldErrors(errors);
+        
+        throw new Error(`Please fill all required fields highlighted below.`);
       }
 
       setLoading(true);
@@ -321,12 +331,16 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">First Name</label>
-                  <input name="first_name" maxLength={50} value={formData.first_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-                </div>
+                  <input name="first_name" maxLength={50} value={formData.first_name || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['first_name'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                
+                {fieldErrors['first_name'] && <p className="text-[10px] text-red-500 font-bold mt-1">First Name is required</p>}
+              </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">Last Name</label>
-                  <input name="last_name" maxLength={50} value={formData.last_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-                </div>
+                  <input name="last_name" maxLength={50} value={formData.last_name || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['last_name'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                
+                {fieldErrors['last_name'] && <p className="text-[10px] text-red-500 font-bold mt-1">Last Name is required</p>}
+              </div>
               </div>
             )}
 
@@ -425,8 +439,10 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-bold uppercase text-slate-400">Phone</label>
-                    <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-                  </div>
+                    <input name="phone" maxLength={20} value={formData.phone || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['phone'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                  
+                {fieldErrors['phone'] && <p className="text-[10px] text-red-500 font-bold mt-1">Phone is required</p>}
+              </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col gap-1">
@@ -435,14 +451,16 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                       name="state_id" 
                       value={formData.state_id || ''} 
                       onChange={handleChange} 
-                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                      className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['state_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
                     >
                       <option value="">Select State</option>
                       {states.map(s => (
                         <option key={s.id} value={s.id}>{s.name}</option>
                       ))}
                     </select>
-                  </div>
+                  
+                {fieldErrors['state_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">State is required</p>}
+              </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-bold uppercase text-slate-400">District</label>
                     <select 
@@ -450,14 +468,16 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                       value={formData.district_id || ''} 
                       onChange={handleChange} 
                       disabled={!formData.state_id}
-                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
+                      className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50 " + (fieldErrors['district_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
                     >
                       <option value="">Select District</option>
                       {districts.map(d => (
                         <option key={d.id} value={d.id}>{d.name}</option>
                       ))}
                     </select>
-                  </div>
+                  
+                {fieldErrors['district_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">District is required</p>}
+              </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-bold uppercase text-slate-400">City</label>
                     <select 
@@ -465,27 +485,35 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                       value={formData.city_id || ''} 
                       onChange={handleChange} 
                       disabled={!formData.district_id}
-                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50"
+                      className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none disabled:opacity-50 " + (fieldErrors['city_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
                     >
                       <option value="">Select City</option>
                       {cities.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
-                  </div>
+                  
+                {fieldErrors['city_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">City is required</p>}
+              </div>
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">Village</label>
-                  <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-                </div>
+                  <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['village'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                
+                {fieldErrors['village'] && <p className="text-[10px] text-red-500 font-bold mt-1">Village is required</p>}
+              </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">Current Address</label>
-                  <textarea name="address" maxLength={255} value={formData.address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
-                </div>
+                  <textarea name="address" maxLength={255} value={formData.address || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm h-20 " + (fieldErrors['address'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                
+                {fieldErrors['address'] && <p className="text-[10px] text-red-500 font-bold mt-1">Current Address is required</p>}
+              </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">Permanent Address</label>
-                  <textarea name="permanent_address" maxLength={255} value={formData.permanent_address || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-20" />
-                </div>
+                  <textarea name="permanent_address" maxLength={255} value={formData.permanent_address || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm h-20 " + (fieldErrors['permanent_address'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+                
+                {fieldErrors['permanent_address'] && <p className="text-[10px] text-red-500 font-bold mt-1">Permanent Address is required</p>}
+              </div>
               </>
             )}
           </div>
@@ -497,10 +525,12 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Gender</label>
-                <select name="gender" value={formData.gender || 'male'} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm">
+                <select name="gender" value={formData.gender || 'male'} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['gender'] ? "border-red-500 bg-red-50" : "border-slate-100")}>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
+              
+                {fieldErrors['gender'] && <p className="text-[10px] text-red-500 font-bold mt-1">Gender is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Date of Birth</label>
@@ -509,18 +539,24 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   name="date_of_birth" 
                   value={formData.date_of_birth ? (formData.date_of_birth.includes('-') && formData.date_of_birth.split('-')[0].length === 2 ? formData.date_of_birth.split('-').reverse().join('-') : formData.date_of_birth) : ''} 
                   onChange={handleChange} 
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['date_of_birth'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
                 />
+              
+                {fieldErrors['date_of_birth'] && <p className="text-[10px] text-red-500 font-bold mt-1">Date of Birth is required</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Birth Time</label>
-                <input type="time" name="birth_time" step="1" value={formData.birth_time || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input type="time" name="birth_time" step="1" value={formData.birth_time || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['birth_time'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['birth_time'] && <p className="text-[10px] text-red-500 font-bold mt-1">Birth Time is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Height (ft)</label>
-                <input type="number" step="0.1" name="height" value={formData.height || 5.8} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input type="number" step="0.1" name="height" value={formData.height || 5.8} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['height'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['height'] && <p className="text-[10px] text-red-500 font-bold mt-1">Height is required</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -530,13 +566,15 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   name="rashi_id" 
                   value={formData.rashi_id || ''} 
                   onChange={handleChange} 
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['rashi_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
                 >
                   <option value="">Select Rashi</option>
                   {rashis.map(r => (
                     <option key={r.id} value={r.id}>{r.name}</option>
                   ))}
                 </select>
+              
+                {fieldErrors['rashi_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">Rashi is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Color / Complexion</label>
@@ -544,23 +582,29 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   name="color_id" 
                   value={formData.color_id || ''} 
                   onChange={handleChange} 
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['color_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
                 >
                   <option value="">Select Color</option>
                   {colors.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
+              
+                {fieldErrors['color_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">Color is required</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Gotr (Self)</label>
-                <input name="gotr" maxLength={30} value={formData.gotr || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="gotr" maxLength={30} value={formData.gotr || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['gotr'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['gotr'] && <p className="text-[10px] text-red-500 font-bold mt-1">Gotr is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Mama Gotr</label>
-                <input name="mama_gotr" maxLength={30} value={formData.mama_gotr || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="mama_gotr" maxLength={30} value={formData.mama_gotr || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['mama_gotr'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['mama_gotr'] && <p className="text-[10px] text-red-500 font-bold mt-1">Mama Gotr is required</p>}
               </div>
             </div>
           </div>
@@ -572,27 +616,37 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Father's Name</label>
-                <input name="father_name" maxLength={50} value={formData.father_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="father_name" maxLength={50} value={formData.father_name || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['father_name'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['father_name'] && <p className="text-[10px] text-red-500 font-bold mt-1">Father's Name is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Mother's Name</label>
-                <input name="mother_name" maxLength={50} value={formData.mother_name || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="mother_name" maxLength={50} value={formData.mother_name || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['mother_name'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['mother_name'] && <p className="text-[10px] text-red-500 font-bold mt-1">Mother's Name is required</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Father's Job</label>
-                <input name="father_occupation" maxLength={50} value={formData.father_occupation || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="father_occupation" maxLength={50} value={formData.father_occupation || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['father_occupation'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['father_occupation'] && <p className="text-[10px] text-red-500 font-bold mt-1">Father's Job is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Mother's Job</label>
-                <input name="mother_occupation" maxLength={50} value={formData.mother_occupation || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
+                <input name="mother_occupation" maxLength={50} value={formData.mother_occupation || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['mother_occupation'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+              
+                {fieldErrors['mother_occupation'] && <p className="text-[10px] text-red-500 font-bold mt-1">Mother's Job is required</p>}
               </div>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Father's Phone</label>
-              <input name="father_phone_number" maxLength={20} value={formData.father_phone_number || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
+              <input name="father_phone_number" maxLength={20} value={formData.father_phone_number || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['father_phone_number'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['father_phone_number'] && <p className="text-[10px] text-red-500 font-bold mt-1">Father's Phone is required</p>}
+              </div>
             <div className="grid grid-cols-2 gap-4 border-t pt-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Brothers</label>
@@ -602,8 +656,10 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   value={formData.number_of_brother ?? 0} 
                   onChange={handleChange} 
                   onFocus={(e) => e.target.select()}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['number_of_brother'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
                 />
+              
+                {fieldErrors['number_of_brother'] && <p className="text-[10px] text-red-500 font-bold mt-1">Brothers is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Brothers</label>
@@ -613,14 +669,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   value={formData.number_of_married_brother ?? 0} 
                   onChange={handleChange} 
                   onFocus={(e) => e.target.select()}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['number_of_married_brother'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
                 />
+              
+                {fieldErrors['number_of_married_brother'] && <p className="text-[10px] text-red-500 font-bold mt-1">Married Brothers is required</p>}
               </div>
             </div>
              <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">About Brothers</label>
-              <input name="about_brother" maxLength={255} value={formData.about_brother || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
+              <input name="about_brother" maxLength={255} value={formData.about_brother || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['about_brother'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['about_brother'] && <p className="text-[10px] text-red-500 font-bold mt-1">About Brothers is required</p>}
+              </div>
             <div className="grid grid-cols-2 gap-4 border-t pt-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Sisters</label>
@@ -630,8 +690,10 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   value={formData.number_of_sister ?? 0} 
                   onChange={handleChange} 
                   onFocus={(e) => e.target.select()}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['number_of_sister'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
                 />
+              
+                {fieldErrors['number_of_sister'] && <p className="text-[10px] text-red-500 font-bold mt-1">Sisters is required</p>}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold uppercase text-slate-400">Married Sisters</label>
@@ -641,14 +703,18 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                   value={formData.number_of_married_sister ?? 0} 
                   onChange={handleChange} 
                   onFocus={(e) => e.target.select()}
-                  className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                  className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['number_of_married_sister'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
                 />
+              
+                {fieldErrors['number_of_married_sister'] && <p className="text-[10px] text-red-500 font-bold mt-1">Married Sisters is required</p>}
               </div>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">About Sisters</label>
-              <input name="about_sister" maxLength={255} value={formData.about_sister || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
+              <input name="about_sister" maxLength={255} value={formData.about_sister || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['about_sister'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['about_sister'] && <p className="text-[10px] text-red-500 font-bold mt-1">About Sisters is required</p>}
+              </div>
           </div>
         );
       case 4:
@@ -661,36 +727,44 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 name="education_id" 
                 value={formData.education_id || ''} 
                 onChange={handleChange} 
-                className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['education_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
               >
                 <option value="">Select Education</option>
                 {educations.map(e => (
                   <option key={e.id} value={e.id}>{e.name}</option>
                 ))}
               </select>
-            </div>
+            
+                {fieldErrors['education_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">Education is required</p>}
+              </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Education Details</label>
-              <input name="education_detail" maxLength={255} value={formData.education_detail || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
+              <input name="education_detail" maxLength={255} value={formData.education_detail || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['education_detail'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['education_detail'] && <p className="text-[10px] text-red-500 font-bold mt-1">Education Details is required</p>}
+              </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Occupation</label>
               <select 
                 name="occupation_id" 
                 value={formData.occupation_id || ''} 
                 onChange={handleChange} 
-                className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none"
+                className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm appearance-none " + (fieldErrors['occupation_id'] ? "border-red-500 bg-red-50" : "border-slate-100")}
               >
                 <option value="">Select Occupation</option>
                 {occupations.map(o => (
                   <option key={o.id} value={o.id}>{o.name}</option>
                 ))}
               </select>
-            </div>
+            
+                {fieldErrors['occupation_id'] && <p className="text-[10px] text-red-500 font-bold mt-1">Occupation is required</p>}
+              </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Occupation Details</label>
-              <input name="occupation_detail" maxLength={255} value={formData.occupation_detail || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" />
-            </div>
+              <input name="occupation_detail" maxLength={255} value={formData.occupation_detail || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['occupation_detail'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['occupation_detail'] && <p className="text-[10px] text-red-500 font-bold mt-1">Occupation Details is required</p>}
+              </div>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Monthly Salary (₹)</label>
               <input 
@@ -699,9 +773,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 value={formData.monthly_salary ?? 0} 
                 onChange={handleChange} 
                 onFocus={(e) => e.target.select()}
-                className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm" 
+                className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['monthly_salary'] ? "border-red-500 bg-red-50" : "border-slate-100")} 
               />
-            </div>
+            
+                {fieldErrors['monthly_salary'] && <p className="text-[10px] text-red-500 font-bold mt-1">Monthly Salary is required</p>}
+              </div>
           </div>
         );
       case 5:
@@ -710,8 +786,10 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
             <h3 className="text-lg font-serif text-brand-primary">Step 5: Final Touches</h3>
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase text-slate-400">Brief Introduction</label>
-              <textarea name="introduction" maxLength={255} value={formData.introduction || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm h-32" />
-            </div>
+              <textarea name="introduction" maxLength={255} value={formData.introduction || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm h-32 " + (fieldErrors['introduction'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
+            
+                {fieldErrors['introduction'] && <p className="text-[10px] text-red-500 font-bold mt-1">Brief Introduction is required</p>}
+              </div>
             <div className="flex items-center gap-4 py-4">
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="manglik_dosh" name="manglik_dosh" checked={formData.manglik_dosh || false} onChange={handleChange} className="w-5 h-5 text-brand-primary outline-none accent-brand-primary" />
