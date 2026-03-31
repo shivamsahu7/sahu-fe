@@ -120,6 +120,48 @@ const ProfilePage = () => {
             <h2 className="text-4xl font-serif text-slate-800 mb-1">{profile.first_name} {profile.last_name}</h2>
             <p className="text-brand-primary font-semibold tracking-[0.2em] uppercase text-[10px] mb-6">Sahu Community Member</p>
             
+            {profile.is_approved === false && (
+              <div className="mb-8 w-full bg-amber-50 border border-amber-200 rounded-2xl p-4 md:p-6 text-left shadow-sm">
+                <div className="flex items-start gap-4">
+                  <div className="bg-amber-100 p-2 rounded-full mt-1 shrink-0">
+                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-amber-800 mb-1 italic">Profile Verification Pending / प्रोफाइल सत्यापन लंबित</h4>
+                    <p className="text-amber-700 text-sm leading-relaxed">
+                      Your profile is in progress to verify. Please update your profile; in the next 2 days, it will be verified. Please wait.
+                    </p>
+                    <p className="text-amber-700 text-sm mt-1 leading-relaxed font-hindi">
+                      आपका प्रोफाइल सत्यापन की प्रक्रिया में है। कृपया अपना प्रोफाइल अपडेट करें; अगले 2 दिनों में इसे सत्यापित कर दिया जाएगा। कृपया प्रतीक्षा करें।
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {profile.is_approved === true && (
+              <div className="mb-8 w-full bg-emerald-50 border border-emerald-200 rounded-2xl p-4 md:p-6 text-left">
+                <div className="flex items-start gap-4">
+                  <div className="bg-emerald-100 p-2 rounded-full mt-1 shrink-0">
+                    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-emerald-800 mb-1 italic">Profile Verified / प्रोफाइल सत्यापित</h4>
+                    <p className="text-emerald-700 text-sm leading-relaxed">
+                      Your profile has been verified.
+                    </p>
+                    <p className="text-emerald-700 text-sm mt-1 leading-relaxed font-hindi">
+                      आपका प्रोफाइल सत्यापित हो गया है।
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <button 
               onClick={() => {
                 setModalMode('full');

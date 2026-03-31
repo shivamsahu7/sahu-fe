@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userService from '../services/userService';
 
@@ -28,9 +28,14 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
     }
   };
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
     // Fetch all default profiles initially without applying the search filters
-    fetchUsers();
+    if (!hasFetched.current) {
+      fetchUsers();
+      hasFetched.current = true;
+    }
   }, []);
 
   const handleSearch = () => {
@@ -50,7 +55,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
 
   return (
     <main>
-      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Hero Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <h1 className="text-5xl md:text-7xl font-serif text-slate-800 mb-2 leading-tight">
@@ -123,7 +128,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
       </section>
       
       {/* Featured Profiles Section */}
-      <section id="featured-profiles" className="py-24 px-6 bg-brand-accent/30">
+      <section id="featured-profiles" className="py-16 px-6 bg-brand-accent/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-serif text-slate-800 mb-4">Featured Profiles</h2>
@@ -167,7 +172,11 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
               </div>
             ) : users.length > 0 ? (
               users.map((user) => (
-                <div key={user.id} className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5">
+                <div 
+                  key={user.id} 
+                  onClick={() => navigate(`/user/${user.slug}`)}
+                  className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-brand-primary/5 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all border border-brand-primary/5 cursor-pointer hover:border-brand-primary/20"
+                >
                   <div className="relative h-80 overflow-hidden">
                     <img 
                       src={user.profile_image || '/default-avatar.png'} 
@@ -182,7 +191,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
                   </div>
                   <div className="p-6 text-left">
                     <h3 className="text-xl font-serif text-slate-800 mb-1">{user.first_name} {user.last_name}, {user.age}</h3>
-                    <div className="flex items-center gap-1.5 text-slate-500 mb-4">
+                    <div className="flex items-center gap-1.5 text-slate-500">
                       <svg className="w-4 h-4 text-brand-primary opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -191,12 +200,6 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
                         {user.city_name ? `${user.city_name}, ` : ''}{user.district_name}, {user.state_name}
                       </p>
                     </div>
-                    <button 
-                      onClick={() => navigate(`/user/${user.slug}`)}
-                      className="w-full py-3 rounded-xl border border-brand-primary/20 text-brand-primary font-semibold text-sm hover:bg-brand-primary hover:text-white transition-all cursor-pointer"
-                    >
-                      View Profile
-                    </button>
                   </div>
                 </div>
               ))
@@ -210,7 +213,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
       </section>
 
       {/* Trust Stats */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-12 px-6 bg-white">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           <div>
             <div className="text-4xl font-serif text-brand-primary mb-2">1M+</div>
@@ -232,7 +235,7 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
       </section>
 
       {/* About Us Section */}
-      <section id="about" className="py-24 px-6 bg-slate-50 relative overflow-hidden">
+      <section id="about" className="py-16 px-6 bg-slate-50 relative overflow-hidden">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
           <div className="w-full md:w-1/2">
             <div className="inline-block px-4 py-1.5 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
