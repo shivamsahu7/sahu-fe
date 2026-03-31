@@ -238,7 +238,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
     try {
       // Validate current step
       const requiredFields = {
-        1: ['first_name', 'last_name', 'phone', 'state_id', 'district_id', 'city_id', 'village', 'address', 'permanent_address'],
+        1: ['first_name', 'last_name', 'phone', 'state_id', 'district_id', 'city_id', 'address', 'permanent_address'],
         2: ['date_of_birth', 'birth_time', 'rashi_id', 'color_id', 'gotr', 'mama_gotr'],
         3: ['father_name', 'mother_name'], // Minimal family validation
         4: ['education_id', 'occupation_id'], // Minimal career validation
@@ -534,11 +534,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-bold uppercase text-slate-400">Village</label>
-                  <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm " + (fieldErrors['village'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
-                
-                {fieldErrors['village'] && <p className="text-[10px] text-red-500 font-bold mt-1">Village is required</p>}
-              </div>
+                  <label className="text-[10px] font-bold uppercase text-slate-400">Village (Optional) / गाँव (वैकल्पिक)</label>
+                  <input name="village" maxLength={30} value={formData.village || ''} onChange={handleChange} className="p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-brand-primary/30 transition-all text-sm " />
+                </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold uppercase text-slate-400">Current Address</label>
                   <textarea name="address" maxLength={255} value={formData.address || ''} onChange={handleChange} className={"p-3 bg-slate-50 rounded-xl border  outline-none focus:border-brand-primary/30 transition-all text-sm h-20 " + (fieldErrors['address'] ? "border-red-500 bg-red-50" : "border-slate-100")} />
