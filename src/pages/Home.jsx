@@ -212,27 +212,6 @@ const Home = ({ fetchProfile, isLoggedIn, loadingProfile }) => {
         </div>
       </section>
 
-      {/* Trust Stats */}
-      <section className="py-12 px-6 bg-white">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-          <div>
-            <div className="text-4xl font-serif text-brand-primary mb-2">1M+</div>
-            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Happy Couples</div>
-          </div>
-          <div>
-            <div className="text-4xl font-serif text-brand-primary mb-2">25Yrs</div>
-            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Legacy of Trust</div>
-          </div>
-          <div>
-            <div className="text-4xl font-serif text-brand-primary mb-2">100%</div>
-            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Verified Profiles</div>
-          </div>
-          <div>
-            <div className="text-4xl font-serif text-brand-primary mb-2">Private</div>
-            <div className="text-slate-500 text-sm font-medium uppercase tracking-widest">Secure Messaging</div>
-          </div>
-        </div>
-      </section>
 
       {/* About Us Section */}
       <section id="about" className="py-16 px-6 bg-slate-50 relative overflow-hidden">
