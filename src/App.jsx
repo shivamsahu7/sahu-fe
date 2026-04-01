@@ -73,18 +73,18 @@ function App() {
   return (
     <div className="min-h-screen font-sans bg-brand-accent flex flex-col">
       {/* Navbar */}
-      <nav className="sticky top-0 z-[90] bg-white/80 backdrop-blur-md border-b border-brand-primary/5 py-3 md:py-4 px-4 md:px-12 flex items-center justify-between shrink-0 gap-2">
+      <nav className="sticky top-0 z-[90] bg-white/80 backdrop-blur-md border-b border-brand-primary/5 py-2 md:py-3 px-4 md:px-12 flex items-center justify-between shrink-0 gap-2">
         <Link to="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-brand-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:rotate-6 transition-transform">
-            <span className="text-white font-serif text-xl md:text-2xl font-bold italic">S</span>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-brand-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:rotate-6 transition-transform">
+            <span className="text-white font-serif text-lg md:text-xl font-bold italic">S</span>
           </div>
           <div className="text-left hidden sm:block">
-            <span className="block text-lg md:text-xl font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
-            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">SahuSaathi</span>
+            <span className="block text-base md:text-lg font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
+            <span className="text-[7px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
           <div className="text-left sm:hidden">
-            <span className="block text-base font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
-            <span className="text-[8px] uppercase tracking-[0.1em] text-brand-primary font-bold">SahuSaathi</span>
+            <span className="block text-sm font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
+            <span className="text-[7px] uppercase tracking-[0.1em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
         </Link>
 
@@ -161,45 +161,45 @@ function App() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-slate-900 py-20 px-6 text-white overflow-hidden relative shrink-0">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10 text-left">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center">
-                <span className="text-brand-primary font-serif text-2xl font-bold italic">S</span>
-              </div>
-              <div className="text-left">
-                <span className="block text-xl font-serif text-white font-bold leading-none">Sahu Saathi</span>
-                <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold">SahuSaathi</span>
-              </div>
+      <footer className="bg-slate-900 py-10 px-6 text-white overflow-hidden relative shrink-0">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-brand-primary font-serif text-xl font-bold italic">S</span>
             </div>
-            <p className="text-slate-400 text-sm max-w-md leading-relaxed mb-8">
-              Helping Sahu community members find their perfect life partner for over two decades. Built on trust, tradition, and transparency.
-            </p>
+            <div className="text-left">
+              <span className="block text-lg font-serif text-white font-bold leading-none">Sahu Saathi</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-bold">SahuSaathi</span>
+            </div>
           </div>
-          <div>
-            <h4 className="text-sm font-bold uppercase tracking-widest mb-8">Community</h4>
-            <ul className="space-y-4 text-slate-400 text-sm">
-              <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-bold uppercase tracking-widest mb-8">Support</h4>
-            <ul className="space-y-4 text-slate-400 text-sm">
-              <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-white transition-colors">Terms Conditions</Link></li>
-              <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
-            </ul>
+
+          <div className="flex flex-wrap gap-x-12 gap-y-6">
+            <div className="flex items-center gap-6">
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Community</h4>
+              <ul className="flex gap-4 text-slate-400 text-xs">
+                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+                <li><Link to="/about" className="hover:text-white transition-colors">About</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+            <div className="flex items-center gap-6">
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Support</h4>
+              <ul className="flex gap-4 text-slate-400 text-xs">
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+                <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto pt-12 mt-12 border-t border-white/5 text-center text-slate-500 text-xs tracking-widest uppercase font-bold">
-          © 2026 SahuSaathi. All Rights Reserved.
+        
+        <div className="max-w-6xl mx-auto pt-8 mt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-[10px] tracking-widest uppercase font-bold">
+          <span>© 2026 SahuSaathi. All Rights Reserved.</span>
+          <span className="hidden md:block text-slate-600">Built for Sahu Society</span>
         </div>
         
         {/* Background Decor */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl"></div>
       </footer>
 
       <Login 

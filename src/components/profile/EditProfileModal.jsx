@@ -889,7 +889,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
         {/* Absolute Close Button */}
         <button 
           onClick={onClose} 
-          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full transition-all shadow-sm z-50 group border border-slate-100"
+          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full transition-all shadow-sm z-50 group border border-slate-100 cursor-pointer"
           aria-label="Close modal"
         >
           <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -929,7 +929,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
                 <button 
                   type="button" 
                   onClick={() => setStep(step - 1)}
-                  className="flex-1 py-4 rounded-xl border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 transition-all font-sans"
+                  className="flex-1 py-4 rounded-xl border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 transition-all font-sans cursor-pointer"
                 >
                   Back
                 </button>
@@ -937,7 +937,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               <button 
                 type="submit" 
                 disabled={loading}
-                className="flex-[2] bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 font-sans"
+                className="flex-[2] bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 font-sans cursor-pointer"
               >
                 {loading ? 'Updating...' : (step === 5 ? 'Finalize Profile' : 'Save & Continue')}
               </button>
@@ -949,7 +949,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onUpdateSuccess, mode 
               <button 
                 type="button" 
                 onClick={onClose}
-                className="w-full bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-sans"
+                className="w-full bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-sans cursor-pointer"
               >
                 Done
               </button>
