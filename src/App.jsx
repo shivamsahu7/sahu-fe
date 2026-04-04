@@ -80,11 +80,9 @@ function App() {
           </div>
           <div className="text-left hidden sm:block">
             <span className="block text-base md:text-lg font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
-            <span className="text-[7px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
           <div className="text-left sm:hidden">
             <span className="block text-sm font-serif text-slate-800 font-bold leading-none">Sahu Saathi</span>
-            <span className="text-[7px] uppercase tracking-[0.1em] text-brand-primary font-bold">SahuSaathi</span>
           </div>
         </Link>
 
