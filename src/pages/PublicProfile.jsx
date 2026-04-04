@@ -273,6 +273,10 @@ const PublicProfile = () => {
                 <h4 className="text-slate-800 font-bold mb-4 uppercase text-xs tracking-widest text-brand-primary">Family Details</h4>
                 <ul className="space-y-3 text-sm">
                   <li className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="text-slate-500">Contact Number</span>
+                    <span className="font-medium text-slate-800 text-right">{profile.phone || 'Not Specified'}</span>
+                  </li>
+                  <li className="flex justify-between border-b border-slate-50 pb-2">
                     <span className="text-slate-500">Father's Name</span>
                     <span className="font-medium text-slate-800 text-right">{profile.father_name || 'Not Specified'}</span>
                   </li>
