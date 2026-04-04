@@ -131,13 +131,13 @@ function App() {
             <>
               <button 
                 onClick={() => { setAuthView('login'); setIsLoginOpen(true); }}
-                className="px-3 md:px-6 py-1.5 md:py-2 text-[10px] md:text-sm font-bold text-brand-primary hover:text-brand-primary-dark transition-all cursor-pointer uppercase tracking-wider md:tracking-widest"
+                className="px-4 md:px-6 py-2 md:py-2 text-xs md:text-sm font-bold text-brand-primary hover:text-brand-primary-dark transition-all cursor-pointer uppercase tracking-wider md:tracking-widest"
               >
                 Login
               </button>
               <button 
                 onClick={() => { setAuthView('register'); setIsLoginOpen(true); }}
-                className="px-4 md:px-8 py-1.5 md:py-2.5 text-[10px] md:text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-wider md:tracking-widest"
+                className="px-5 md:px-8 py-2 md:py-2.5 text-xs md:text-sm font-bold bg-brand-primary text-white rounded-full shadow-lg shadow-brand-primary/20 hover:scale-105 transition-transform cursor-pointer uppercase tracking-wider md:tracking-widest"
               >
                 Register
               </button>
